@@ -1,3 +1,18 @@
 #password-wall {
     display: none;
 }
+
+body.password-wall-active {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+#password-wall.password-wall-active {
+    display: block;
+    position: absolute;
+    inset: 0;
+    background-color: white;
+    z-index: 100;
+    overflow-y: scroll;
+}
