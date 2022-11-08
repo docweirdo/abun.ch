@@ -19,21 +19,27 @@
 
 </head>
 
-<body>
+<body x-data="{ passwordWall: false }" :class="passwordWall && 'password-wall-active'">
 
-    <div id="password-wall">
-        <form>
+    <div :class="passwordWall && 'password-wall-active d-flex'" class=" align-items-center justify-content-center"
+        id="password-wall">
+        <form action="" method="post">
             <div class="mb-3">
                 <label for="bunch-password" class="form-label">Password</label>
                 <input type="password" class="form-control" id="bunch-password">
                 <div id="bunch-password-help" class="form-text">Ask the person who's shared this link.</div>
             </div>
+            <div class="d-flex justify-content-center">
+                <button x-on:click="passwordWall = ! passwordWall" type="button" class="btn btn-primary">Submit</button>
+            </div>
         </form>
-        <button type="submit" class="btn btn-primary" disabled>Submit</button>
+
+
+
     </div>
 
     <div class="container">
-        <div class="row my-5 justify-content-center justify-content-sm-start">
+        <div class="row py-5 justify-content-center justify-content-sm-start">
             <div class="col-sm h2 d-flex justify-content-sm-start justify-content-center" id="bunch-title">
                 Shopping Links
             </div>
@@ -50,7 +56,7 @@
         </div>
     </div>
 
-    <div class="card container">
+    <div class="card container bg-light">
         <div class="card-body">
             <h6 class="card-title">Description</h6>
             <div id="bunch-description">
@@ -59,7 +65,9 @@
         </div>
     </div>
 
-
+    <div class="container">
+        <button x-on:click="passwordWall = ! passwordWall" class="btn btn-primary my-5">Submit</button>
+    </div>
 
 
 
