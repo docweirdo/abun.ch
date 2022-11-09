@@ -2,11 +2,11 @@
 
 ### Schema
 
-bunch: title, description, date, expiration, clickcounter, uri, **creator**, password, fetchOpenGraph
+bunch: id, title, description, date, expiration, clickcounter, uri, **creator**, password, fetchOpenGraph, incognito
 
-entries: url, clickcounter, description, title, **bunch**
+entries: id, url, clickcounter, description, title, **bunch**
 
-creator: name, password, username, is_admin
+creator: id, name, password, username, is_admin
 
 ### API Calls
 
@@ -14,7 +14,7 @@ creator: name, password, username, is_admin
 
 `POST /bunch_uri/clicked` - entry_id
 
-`POST /new` - {title, description, expiration, password, fetchopengraph, uri, [{url, title, description}, ...]}
+`POST /new` - {title, description, expiration, password, fetchopengraph, incognito, uri, [{url, title, description}, ...]}
 
 
 #### Later
