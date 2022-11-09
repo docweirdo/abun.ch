@@ -16,3 +16,13 @@ body.password-wall-active {
     z-index: 100;
     overflow-y: scroll;
 }
+
+#link-list-header {
+    border-width: 0 0 3px;
+}
+
+@media (min-width: 991.98px) {
+    .container {
+        max-width: 720px;
+    }
+}

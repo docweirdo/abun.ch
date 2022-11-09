@@ -65,13 +65,37 @@
         </div>
     </div>
 
-    <div class="container">
-        <button x-on:click="passwordWall = ! passwordWall" class="btn btn-primary my-5">Submit</button>
+    <div class="my-5"></div>
+
+    <div class="container" id="link-container">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" id="link-list-header">
+                <input x-on:click="selectAll($el)" class="form-check-input" type="checkbox" value=""
+                    id="select-all-checkbox">
+            </li>
+            <template x-for="entry in $store.links" :key="entry.id">
+                <li class="list-group-item">
+                    <input
+                        @click="if ($el.checked) $store.selected.set(entry.id, entry); else $store.selected.delete(entry.id)"
+                        class="form-check-input me-3" type="checkbox" value="">
+                    <a :href="entry.url" class="link-dark link-list-link" x-text="entry.title"></a>
+                </li>
+            </template>
+        </ul>
     </div>
 
 
 
-    <script src="scripts.js"></script>
+    <div class="container d-flex justify-content-end">
+        <button x-on:click="openLinks" class="btn btn-primary mt-3" :disabled="$store.selected.size == 0">Open</button>
+    </div>
+
+
+    <div class="container">
+        <button x-on:click="passwordWall = ! passwordWall" class="btn btn-primary my-5">Password Wall</button>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 
 </html>
