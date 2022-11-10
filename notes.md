@@ -6,7 +6,7 @@ bunch: id, title, description, date, expiration, clickcounter, uri, **creator**,
 
 entries: id, url, clickcounter, description, title, **bunch**
 
-creator: id, name, password, username, is_admin
+creator: id, password, username, is_admin
 
 ### API Calls
 
