@@ -1,7 +1,7 @@
 -- Add migration script here
 CREATE TABLE creator (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(15) NOT NULL,
+    username VARCHAR(15) NOT NULL UNIQUE,
     password CHAR(60) NOT NULL,
     admin BOOLEAN NOT NULL
 );
