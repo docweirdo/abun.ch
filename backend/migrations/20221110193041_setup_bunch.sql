@@ -1,6 +1,6 @@
 -- Add migration script here
 CREATE TABLE bunch (
-    id SERIAL PRIMARY KEY,
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     title VARCHAR(35) NOT NULL,
     description VARCHAR(280),
     date DATE NOT NULL,

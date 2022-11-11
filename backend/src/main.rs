@@ -4,6 +4,7 @@ use rocket_db_pools::{sqlx, Database};
 mod api;
 mod db;
 mod error;
+mod bunch_url;
 
 #[derive(Database)]
 #[database("abunch_db")]

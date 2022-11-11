@@ -1,6 +1,6 @@
 -- Add migration script here
 CREATE TABLE entry (
-    id SERIAL PRIMARY KEY,
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     url TEXT NOT NULL,
     clickcounter INTEGER,
     description VARCHAR(280),

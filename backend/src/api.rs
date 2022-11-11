@@ -11,11 +11,17 @@ use serde::{Deserialize, Serialize};
 use std::time::SystemTime;
 
 use crate::error::AbunchError;
+use crate::bunch_url::BunchURL;
 
 const COOKIE_DURATION: u64 = 20 * 60; // 20 mins
 
 pub fn mount_endpoints(rocket: Rocket<Build>) -> Rocket<Build> {
-    rocket.mount("/", routes![login, set_password])
+    rocket.mount("/", routes![login, set_password, bunch])
+}
+
+#[get("/<bunch_url>")]
+pub async fn bunch(bunch_url: BunchURL, conn: Connection<AbunchDB>) {
+    //db::get_bunch_by_url(conn, bunch_url);
 }
 
 #[derive(Serialize, Deserialize)]
