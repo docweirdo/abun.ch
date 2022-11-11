@@ -12,6 +12,7 @@ use std::time::SystemTime;
 
 use crate::error::AbunchError;
 use crate::bunch_url::BunchURL;
+use crate::model::Bunch;
 
 const COOKIE_DURATION: u64 = 20 * 60; // 20 mins
 
@@ -20,8 +21,10 @@ pub fn mount_endpoints(rocket: Rocket<Build>) -> Rocket<Build> {
 }
 
 #[get("/<bunch_url>")]
-pub async fn bunch(bunch_url: BunchURL, conn: Connection<AbunchDB>) {
-    //db::get_bunch_by_url(conn, bunch_url);
+pub async fn bunch(bunch_url: BunchURL, conn: Connection<AbunchDB>) -> Result<Json<Bunch>, AbunchError>{
+    let bunch: Bunch = db::get_bunch_by_url(bunch_url, conn).await?;
+
+    Ok(Json(bunch))
 }
 
 #[derive(Serialize, Deserialize)]

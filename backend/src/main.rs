@@ -5,6 +5,7 @@ mod api;
 mod db;
 mod error;
 mod bunch_url;
+mod model;
 
 #[derive(Database)]
 #[database("abunch_db")]

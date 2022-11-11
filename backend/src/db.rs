@@ -1,8 +1,8 @@
 use pwhash::bcrypt;
 use rocket_db_pools::Connection;
-use sqlx::query;
+use sqlx::{query, query_as};
 
-use crate::error::AbunchError;
+use crate::{error::AbunchError, bunch_url::BunchURL, model::{Bunch, Entry}};
 pub use crate::AbunchDB;
 
 pub async fn verify_user(
@@ -31,4 +31,33 @@ pub async fn set_password(
     query!("UPDATE creator SET password = $1 WHERE id = $2", hash, user_id).execute(&mut*conn).await?;
 
     Ok(())
+}
+
+pub async fn get_bunch_by_url(bunch_url: BunchURL, mut conn: Connection<AbunchDB>) -> Result<Bunch, AbunchError>{
+    let bunch = query!("SELECT id, title, description, date, open_graph, incognito, creator_id FROM bunch WHERE uri = $1", bunch_url.to_string())
+        .fetch_one(&mut *conn)
+        .await?;
+
+    let username = if !bunch.incognito{
+        let record = query!("SELECT username FROM creator WHERE id = $1", bunch.creator_id).fetch_one(&mut *conn).await?;
+        Some(record.username)
+    } else {
+        None
+    };
+
+    let entries = query_as!(Entry, "SELECT id, title, description, url FROM entry WHERE bunch_id = $1", bunch.id).fetch_all(&mut *conn).await?;
+
+
+
+    let bunch_nested = Bunch{
+        id: bunch.id,
+        title: bunch.title,
+        description: bunch.description,
+        date: bunch.date,
+        open_graph: bunch.open_graph,
+        username,
+        entries
+    };
+
+    Ok(bunch_nested)
 }

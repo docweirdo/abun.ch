@@ -2,7 +2,7 @@
 
 ### Schema
 
-bunch: id, title, description, date, expiration, clickcounter, uri, **creator**, password, fetchOpenGraph, incognito
+bunch: id, title, description, date, expiration, clickcounter, uri, **creator**, password, open_graph, incognito
 
 entries: id, url, clickcounter, description, title, **bunch**
 
@@ -10,7 +10,7 @@ creator: id, password, username, admin
 
 ### API Calls
 
-`GET /bunch_uri`
+`GET /bunch_uri` - {title, (description), date, (creator.username), open_graph, [id, url, title, description]}
 
 `POST /bunch_uri/clicked` - entry_id
 

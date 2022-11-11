@@ -6,4 +6,4 @@ CREATE TABLE creator (
     admin BOOLEAN NOT NULL
 );
 
-ALTER TABLE bunch ADD creator_id INTEGER REFERENCES bunch(id);
+ALTER TABLE bunch ADD creator_id INTEGER NOT NULL REFERENCES creator(id);

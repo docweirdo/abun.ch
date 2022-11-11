@@ -6,8 +6,8 @@ CREATE TABLE bunch (
     date DATE NOT NULL,
     expiration DATE,
     clickcounter INTEGER NOT NULL,
-    uri CHAR(6) NOT NULL,
+    uri CHAR(6) NOT NULL UNIQUE,
     password CHAR(60),
-    fetchOpenGraph BOOLEAN NOT NULL,
+    open_graph BOOLEAN NOT NULL,
     incognito BOOLEAN NOT NULL
 );
