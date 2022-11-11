@@ -16,7 +16,7 @@ pub enum AbunchError {
     #[allow(dead_code)]
     StatusCode(u16),
 
-    #[error("wrong password for user {0}")]
+    #[error("wrong password for {0}")]
     WrongPassword(String),
 
     #[error("can't convert {0} to BunchURL")]
