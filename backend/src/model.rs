@@ -24,3 +24,22 @@ pub struct Entry{
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description : Option<String>
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct NewBunch{
+    pub title: String,
+    pub description: Option<String>,
+    pub expiration: Option<Date>,
+    pub password: Option<String>,
+    pub open_graph: bool,
+    pub incognito: bool,
+    pub entries: Vec<NewEntry>
+}
+
+
+#[derive(Serialize, Deserialize)]
+pub struct NewEntry{
+    pub url: String,
+    pub title: Option<String>,
+    pub description: Option<String>
+}

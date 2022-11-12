@@ -3,6 +3,7 @@ use crate::db::AbunchDB;
 use pwhash::bcrypt;
 use rocket::{
     http::{Cookie, CookieJar, Status},
+    data::{self, Data, FromData, ToByteUnit},
     request::{self, Request, FromRequest, FromParam},
     post, routes, get,
     serde::json::Json,
@@ -10,20 +11,21 @@ use rocket::{
 };
 use rocket_db_pools::Connection;
 use serde::{Deserialize, Serialize};
-use std::time::SystemTime;
 
 use crate::error::AbunchError;
 use crate::bunch_url::BunchURL;
 use crate::model::Bunch;
+use crate::model::NewBunch;
 
-const COOKIE_DURATION: u64 = 20 * 60; // 20 mins
+const COOKIE_DURATION: i64 = 20 * 60; // 20 mins
 
 pub fn mount_endpoints(rocket: Rocket<Build>) -> Rocket<Build> {
     rocket.mount("/", routes![
         login, 
         set_password, 
         bunch,
-        clicked
+        clicked,
+        new_bunch
         ])
 }
 
@@ -40,6 +42,11 @@ pub async fn clicked(_auth_header: AuthorizationGuard, bunch_url: BunchURL, entr
     db::clicked_url(bunch_url, entry_id, conn).await
 }
 
+#[post("/new", data = "<new_bunch>")]
+pub async fn new_bunch(creator: CreatorGuard, new_bunch: NewBunch){
+
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct Credentials {
     username: String,
@@ -48,8 +55,8 @@ pub struct Credentials {
 
 #[derive(Debug, Serialize, Deserialize)]
 struct JWTClaims {
-    exp: u64,
-    iat: u64,
+    exp: i64,
+    iat: i64,
     id: i32,
 }
 
@@ -72,8 +79,8 @@ pub async fn login(
     let id = db::verify_user(conn, username, password).await?;
 
     // Create JWT
-    let now: u64 = SystemTime::UNIX_EPOCH.elapsed().unwrap().as_secs();
-    let expiration_time: u64 = now + COOKIE_DURATION;
+    let now: i64 = time::OffsetDateTime::now_utc().unix_timestamp();
+    let expiration_time: i64 = now + COOKIE_DURATION;
     let my_claims = JWTClaims {
         exp: expiration_time,
         iat: now,
@@ -90,6 +97,32 @@ pub async fn login(
     );
 
     Ok(())
+}
+
+pub struct CreatorGuard(i32);
+
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for CreatorGuard{
+    type Error = AbunchError;
+
+    async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
+        let cookie_jar: &CookieJar<'r> = req.cookies();
+
+        let Some(cookie) = cookie_jar.get_private("logged_in") else {
+            return request::Outcome::Failure((Status::Unauthorized, AbunchError::StatusCode(401)));
+        };
+
+        let Ok(claims) = serde_json::from_str::<JWTClaims>(cookie.value()) else {
+            return request::Outcome::Failure((Status::Unauthorized, AbunchError::StatusCode(401)));
+        };
+
+        if time::OffsetDateTime::from_unix_timestamp(claims.exp) > time::OffsetDateTime::now_utc(){
+            return request::Outcome::Success(Self(claims.id));
+        } else {
+            return request::Outcome::Failure((Status::Unauthorized, AbunchError::StatusCode(401)));
+        }
+        
+    }
 }
 
 pub struct AuthorizationGuard;
@@ -134,3 +167,33 @@ impl<'r> FromRequest<'r> for AuthorizationGuard{
     }
 }
 
+
+#[rocket::async_trait]
+impl<'r> FromData<'r> for NewBunch {
+    type Error = AbunchError;
+
+    async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> data::Outcome<'r, Self> {
+
+        let limit = req.limits().get("new_bunch").unwrap_or_else(|| 2048_i32.bytes());
+
+        let string = match data.open(limit).into_string().await {
+            Ok(string) if string.is_complete() => string.into_inner(),
+            Ok(_) => return data::Outcome::Failure((Status::PayloadTooLarge, AbunchError::StatusCode(413))),
+            Err(_) => return data::Outcome::Failure((Status::InternalServerError, AbunchError::StatusCode(500))),
+        };
+
+        let new_bunch = match serde_json::from_str::<NewBunch>(&string){
+            Ok(n) => n,
+            Err(e) => return data::Outcome::Failure((Status::BadRequest, AbunchError::SerdeError(e)))
+        };
+
+        if let Some(exp) = new_bunch.expiration{
+            if time::OffsetDateTime::now_utc().date() >= exp {
+                return data::Outcome::Failure((Status::BadRequest, AbunchError::StatusCode(400)))
+            }
+        }
+
+        data::Outcome::Success(new_bunch)
+
+    }
+}

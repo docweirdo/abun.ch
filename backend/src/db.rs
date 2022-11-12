@@ -65,6 +65,8 @@ pub async fn get_bunch_by_url(bunch_url: BunchURL, mut conn: Connection<AbunchDB
         entries
     };
 
+    query!("UPDATE bunch SET clickcounter = clickcounter + 1 WHERE id = $1", bunch.id).execute(&mut *conn).await?;
+
     Ok(bunch_nested)
 }
 

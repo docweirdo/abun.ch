@@ -14,7 +14,7 @@ creator: id, password, username, admin
 
 `POST /bunch_uri/clicked` - entry_id
 
-`POST /new` - {title, description, expiration, password, fetchopengraph, incognito, uri, [{url, title, description}, ...]}
+`POST /new` - {title, description, expiration, password, fetchopengraph, incognito, [{url, title, description}, ...]}
 
 
 #### Later
@@ -25,3 +25,6 @@ creator: id, password, username, admin
 `GET /stat-panel`
 
 ...
+
+## Unobvious to do:
+* Check expiration date before serving bunch (and delete)
