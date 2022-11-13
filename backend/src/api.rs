@@ -43,8 +43,9 @@ pub async fn clicked(_auth_header: AuthorizationGuard, bunch_url: BunchURL, entr
 }
 
 #[post("/new", data = "<new_bunch>")]
-pub async fn new_bunch(creator: CreatorGuard, new_bunch: NewBunch){
-
+pub async fn new_bunch(creator: CreatorGuard, new_bunch: NewBunch, conn: Connection<AbunchDB>) -> Result<Json<String>, AbunchError>{
+    let uri = db::new_bunch(new_bunch, creator.0, conn).await?;
+    Ok(Json(uri.to_string()))
 }
 
 #[derive(Serialize, Deserialize)]

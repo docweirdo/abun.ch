@@ -28,3 +28,4 @@ creator: id, password, username, admin
 
 ## Unobvious to do:
 * Check expiration date before serving bunch (and delete)
+* worry about transactions

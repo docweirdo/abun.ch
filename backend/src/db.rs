@@ -2,7 +2,7 @@ use pwhash::bcrypt;
 use rocket_db_pools::Connection;
 use sqlx::{query, query_as};
 
-use crate::{error::AbunchError, bunch_url::BunchURL, model::{Bunch, Entry}};
+use crate::{error::AbunchError, bunch_url::BunchURL, model::{Bunch, Entry, NewBunch}};
 pub use crate::AbunchDB;
 
 pub async fn verify_user(
@@ -80,4 +80,45 @@ pub async fn clicked_url(bunch_url: BunchURL, entry_id: i32, mut conn: Connectio
     } else {
         Ok(())
     }
+}
+
+pub async fn new_bunch(new_bunch: NewBunch, creator_id : i32, mut conn: Connection<AbunchDB>) -> Result<BunchURL, AbunchError>{
+    
+    let mut uri = BunchURL::new();
+
+    loop {
+        let result = query!("SELECT COUNT(1) FROM bunch WHERE uri = $1", uri.to_string()).fetch_one(&mut *conn).await?;
+
+        if result.count == Some(0) {break;}
+
+        uri = BunchURL::new();
+    }
+    
+    let bunch = query!("
+        INSERT INTO bunch(title, description, date, expiration, clickcounter, uri, password, open_graph, incognito, creator_id) 
+        VALUES($1, $2, CURRENT_DATE, $3, 0, $4, $5, $6, $7, $8) RETURNING id;",
+        new_bunch.title,
+        new_bunch.description,
+        new_bunch.expiration,
+        uri.to_string(),
+        new_bunch.password,
+        new_bunch.open_graph,
+        new_bunch.incognito,
+        creator_id
+    ).fetch_one(&mut *conn).await?;
+
+    for entry in new_bunch.entries {
+
+        query!("
+            INSERT INTO entry(title, description, url, clickcounter, bunch_id) 
+            VALUES($1, $2, $3, 0, $4);",
+            entry.title,
+            entry.description,
+            entry.url,
+            bunch.id
+        ).execute(&mut *conn).await?;
+    }
+    
+
+    Ok(uri)
 }
