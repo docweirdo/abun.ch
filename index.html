@@ -9,12 +9,13 @@
     <title>A bunch of links</title>
     <meta name="description" content="A simple HTML5 Template for new projects.">
 
-    <link rel="icon" href="../favicon.ico">
+    <link rel="icon" href="favicon.ico">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css?v=1.0">
 
+    <script defer src="https://unpkg.com/@shaun/alpinejs-router@1.x.x/dist/cdn.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 </head>
@@ -24,13 +25,15 @@
     <div :class="passwordWall && 'password-wall-active d-flex'" class=" align-items-center justify-content-center"
         id="password-wall">
         <form action="" method="post">
-            <div class="mb-3">
-                <label for="bunch-password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="bunch-password">
-                <div id="bunch-password-help" class="form-text">Ask the person who's shared this link.</div>
+            <div class="mb-3" x-data="{route_new: $router.is('/new')}">
+                <label x-show="route_new" for="username" class="form-label">Username</label>
+                <input x-show="route_new" type="text" class="form-control mb-2" id="username">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password">
+                <div x-show="!route_new" id="bunch-password-help" class="form-text">Ask the person who's shared this link.</div>
             </div>
             <div class="d-flex justify-content-center">
-                <button x-on:click="passwordWall = ! passwordWall" type="button" class="btn btn-primary">Submit</button>
+                <button x-on:click="passwordWall = ! passwordWall" type="button" class="btn btn-primary">Log in</button>
             </div>
         </form>
 
