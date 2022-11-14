@@ -1,8 +1,14 @@
-document.addEventListener('alpine:init', () => {
-    Alpine.store('links', [])
-    Alpine.store('selected', new Map())
+document.addEventListener('alpine:init', async () => {
+    if (Alpine.router.is('/:uri([a-zA-Z0-9_-]{6})')) { //TODO
 
-    Alpine.store('links', [{ id: 1, url: 'http://google.com', title: 'Google' }, { id: 2, url: 'http://bing.com', title: 'Bing' }, { id: 3, url: 'http://yahoo.com', title: 'Yahoo' }])
+        Alpine.store('links', [])
+        Alpine.store('selected', new Map())
+
+        Alpine.store('links', [{ id: 1, url: 'http://google.com', title: 'Google' }, { id: 2, url: 'http://bing.com', title: 'Bing' }, { id: 3, url: 'http://yahoo.com', title: 'Yahoo' }])
+
+    }
+
+    
 })
 
 
