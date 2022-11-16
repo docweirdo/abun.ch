@@ -36,34 +36,29 @@
                 <button x-on:click="passwordWall = ! passwordWall" type="button" class="btn btn-primary">Log in</button>
             </div>
         </form>
-
-
-
     </div>
 
-    <div class="container">
+    <div class="container" x-data="{emitEvent: $dispatch('build', {router: $router})}" id="bunch-header">
         <div class="row py-5 justify-content-center justify-content-sm-start">
-            <div class="col-sm h2 d-flex justify-content-sm-start justify-content-center" id="bunch-title">
-                Shopping Links
+            <div class="col-sm h2 d-flex justify-content-sm-start justify-content-center" id="bunch-title" x-text="$store.bunch.title">
             </div>
             <div class="col-auto align-self-center" id="bunch-date-author">
                 <div class="row">
                     <div class="col">from:</div>
-                    <div class="col d-flex justify-content-end" id="bunch-date">08.12.2022</div>
+                    <div class="col d-flex justify-content-end" id="bunch-date" x-text="$store.bunch.date"></div>
                 </div>
-                <div class="row">
+                <div class="row" x-show="$store.bunch.username">
                     <div class="col">by:</div>
-                    <div class="col d-flex justify-content-end" id="bunch-creator">CoconutCreep</div>
+                    <div class="col d-flex justify-content-end" id="bunch-creator" x-text="$store.bunch.username"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card container bg-light">
+    <div class="card container bg-light" x-show="$store.bunch.description">
         <div class="card-body">
             <h6 class="card-title">Description</h6>
-            <div id="bunch-description">
-                This is a collection of links I thought you might like.
+            <div id="bunch-description" x-text="$store.bunch.description">
             </div>
         </div>
     </div>
@@ -81,7 +76,7 @@
                     <input
                         @click="if ($el.checked) $store.selected.set(entry.id, entry); else $store.selected.delete(entry.id)"
                         class="form-check-input me-3" type="checkbox" value="">
-                    <a :href="entry.url" class="link-dark link-list-link" x-text="entry.title"></a>
+                    <a @click="sendClicked(entry)" class="link-dark link-list-link" x-text="entry.title"></a>
                 </li>
             </template>
         </ul>
