@@ -56,7 +56,6 @@ pub async fn get_bunch_by_url(bunch_url: BunchURL, mut conn: Connection<AbunchDB
     let entries = query_as!(Entry, "SELECT id, title, description, url FROM entry WHERE bunch_id = $1", bunch.id).fetch_all(&mut *conn).await?;
 
     let bunch_nested = Bunch{
-        id: bunch.id,
         title: bunch.title,
         description: bunch.description,
         date: bunch.date,

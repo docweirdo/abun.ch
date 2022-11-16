@@ -4,7 +4,6 @@ use time::Date;
 
 #[derive(Serialize, Deserialize)]
 pub struct Bunch {
-    pub id : i32,
     pub title : String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description : Option<String>,
