@@ -8,9 +8,11 @@ use rocket::{
     post, routes, get,
     serde::json::Json,
     Build, Rocket,
+    time::Duration
 };
 use rocket_db_pools::Connection;
 use serde::{Deserialize, Serialize};
+
 
 use crate::error::AbunchError;
 use crate::bunch_url::BunchURL;
@@ -22,7 +24,6 @@ const COOKIE_DURATION: i64 = 20 * 60; // 20 mins
 pub fn mount_endpoints(rocket: Rocket<Build>) -> Rocket<Build> {
     rocket.mount("/", routes![
         login, 
-        set_password, 
         bunch,
         clicked,
         new_bunch
@@ -61,13 +62,6 @@ struct JWTClaims {
     id: i32,
 }
 
-#[get("/test/<password>")]
-pub async fn set_password(password: String, conn: Connection<AbunchDB>) -> Result<(), AbunchError> {
-    db::set_password(conn, 1, &password)
-        .await
-        .map_err(|_| AbunchError::StatusCode(500))
-}
-
 #[post("/login", data = "<credentials>")]
 pub async fn login(
     cookie_jar: &CookieJar<'_>,
@@ -89,13 +83,14 @@ pub async fn login(
     };
 
     cookie_jar.add_private(
-        Cookie::build("logged_in", serde_json::to_string(&my_claims)?)
+        Cookie::build("logged_in_info", serde_json::to_string(&my_claims)?)
             .http_only(true)
-            .permanent()
+            .max_age(Duration::seconds(COOKIE_DURATION-1))
             .path("/")
             .secure(!cfg!(debug_assertions))
             .finish(),
     );
+    cookie_jar.add(Cookie::build("logged_in", "true").path("/").max_age(Duration::seconds(COOKIE_DURATION-1)).finish());
 
     Ok(())
 }
@@ -109,7 +104,7 @@ impl<'r> FromRequest<'r> for CreatorGuard{
     async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
         let cookie_jar: &CookieJar<'r> = req.cookies();
 
-        let Some(cookie) = cookie_jar.get_private("logged_in") else {
+        let Some(cookie) = cookie_jar.get_private("logged_in_info") else {
             return request::Outcome::Failure((Status::Unauthorized, AbunchError::StatusCode(401)));
         };
 

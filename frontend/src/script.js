@@ -1,20 +1,12 @@
 document.addEventListener('alpine:init', async () => {
-    
     Alpine.store('links', [])
+    Alpine.store('passwordWall', false)
     Alpine.store('selected', new Map())
     Alpine.store('bunch', new Bunch())
+    Alpine.store('path', '')
 })
 
-document.getElementById('bunch-header').addEventListener('build', (e) => {
-    router = e.detail.router;
-    
-    if (router.is('/:uri([a-zA-Z0-9_-]{6})')) {
-        path = router.path.slice(1)
-        fetchBunch(router.path.slice(1))
-    }
-}); 
-
-let path = ''
+let headers = new Headers();
 
 class Bunch {
     title;
@@ -52,8 +44,45 @@ class Link {
     }
 }
 
-const fetchBunch = async uri => {
-    let response = await fetch(`/api/${uri}`)
+const determinePath = (router) => {
+
+    Alpine.store('path', router.path.slice(1))
+    
+    if (router.is('/:uri([a-zA-Z0-9_-]{6})')) {
+        fetchBunch()
+    } else if (router.is('/new')){
+        let cookies = document.cookie.split(";");;
+        let found = false;
+
+        for (c of cookies){
+            if (c.split("=")[0] == 'logged_in') {
+                found = true;
+                break;
+            }
+        }
+
+        if (found) return;
+
+        Alpine.store('passwordWall', true); 
+    }
+}; 
+
+const fetchBunch = async () => {
+    
+    let response = await fetch(`/api/${Alpine.store('path')}`, {headers})
+    
+    if (response.status === 401){
+        let p = localStorage.getItem(Alpine.store('path'))
+        if (p){
+            usePassword(p)
+            return;
+        }
+
+        Alpine.store('passwordWall', true)
+        return;
+    }
+    Alpine.store('passwordWall', false)
+
     let bunch = await response.json()
 
     window.bunch = bunch
@@ -88,13 +117,25 @@ const selectAll = e => {
 const openLinks = () => {
 
     for (const [id, link] of Alpine.store('selected')) {
-
-        window.open(link.url, '_blank');
+        sendClicked(link)
     }
 
 }
 
 const sendClicked = (entry) => {
-    fetch(`/api/${path}/clicked/${entry.id}`, {method: 'POST'})
+    fetch(`/api/${Alpine.store('path')}/clicked/${entry.id}`, {method: 'POST', headers})
     window.open(entry.url, '_blank')
+}
+
+const usePassword = p =>{
+    localStorage.setItem(Alpine.store('path'), p);
+    headers.set('Authorization', p); 
+    fetchBunch();
+}
+
+const login = async (u, p) =>{
+    let response = await fetch('/api/login', { method: 'POST', body: JSON.stringify({password: p, username: u})})
+    if (response.ok){
+        Alpine.store('passwordWall', false)
+    }
 }
