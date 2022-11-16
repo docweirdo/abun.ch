@@ -20,29 +20,36 @@
 
 </head>
 
-<body x-data="{ passwordWall: false }" :class="passwordWall && 'password-wall-active'">
+<body x-data="{get route_new() {return $store.path === 'new'}}" x-init="determinePath($router)" :class="$store.passwordWall && 'password-wall-active'">
+    <div x-data="{
+        passwordVal: '', 
+        usernameVal: '',
 
-    <div :class="passwordWall && 'password-wall-active d-flex'" class=" align-items-center justify-content-center"
+        submit(){
+            route_new ? login(this.usernameVal, this.passwordVal) : usePassword(this.passwordVal)
+        }
+
+    }" :class="$store.passwordWall && 'password-wall-active d-flex'" class=" align-items-center justify-content-center"
         id="password-wall">
-        <form action="" method="post">
-            <div class="mb-3" x-data="{route_new: $router.is('/new')}">
+        <form action="" method="post" x-data :autocomplete="route_new ? 'on' : 'off'">
+            <div class="mb-3">
                 <label x-show="route_new" for="username" class="form-label">Username</label>
-                <input x-show="route_new" type="text" class="form-control mb-2" id="username">
+                <input x-show="route_new" type="text" class="form-control mb-2" id="username" x-model="usernameVal">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password">
+                <input type="password" class="form-control" id="password" x-model="passwordVal" @keyup.enter="submit()">
                 <div x-show="!route_new" id="bunch-password-help" class="form-text">Ask the person who's shared this link.</div>
             </div>
             <div class="d-flex justify-content-center">
-                <button x-on:click="passwordWall = ! passwordWall" type="button" class="btn btn-primary">Log in</button>
+                <button x-on:click="submit()" type="button" class="btn btn-primary">Log in</button>
             </div>
         </form>
     </div>
 
-    <div class="container" x-data="{emitEvent: $dispatch('build', {router: $router})}" id="bunch-header">
+    <div class="container">
         <div class="row py-5 justify-content-center justify-content-sm-start">
-            <div class="col-sm h2 d-flex justify-content-sm-start justify-content-center" id="bunch-title" x-text="$store.bunch.title">
-            </div>
-            <div class="col-auto align-self-center" id="bunch-date-author">
+            <input class="col-sm h2 d-flex justify-content-sm-start justify-content-center new" id="bunch-title" x-model="$store.bunch.title" :disabled="!route_new" placeholder="Title">
+            </input>
+            <div class="col-auto align-self-center" id="bunch-date-author" x-show="!route_new">
                 <div class="row">
                     <div class="col">from:</div>
                     <div class="col d-flex justify-content-end" id="bunch-date" x-text="$store.bunch.date"></div>
@@ -55,10 +62,10 @@
         </div>
     </div>
 
-    <div class="card container bg-light" x-show="$store.bunch.description">
+    <div class="card container bg-light" x-show="$store.bunch.description || route_new">
         <div class="card-body">
-            <h6 class="card-title">Description</h6>
-            <div id="bunch-description" x-text="$store.bunch.description">
+            <h6 x-show="!route_new" class="card-title">Description</h6>
+            <input class="new bg-light" id="bunch-description" x-model="$store.bunch.description" placeholder="Description" :disabled="!route_new">
             </div>
         </div>
     </div>
@@ -67,7 +74,7 @@
 
     <div class="container" id="link-container">
         <ul class="list-group list-group-flush">
-            <li class="list-group-item" id="link-list-header">
+            <li class="list-group-item" id="link-list-header" x-show="!route_new">
                 <input x-on:click="selectAll($el)" class="form-check-input" type="checkbox" value=""
                     id="select-all-checkbox">
             </li>
@@ -86,11 +93,6 @@
 
     <div class="container d-flex justify-content-end">
         <button x-on:click="openLinks" class="btn btn-primary mt-3" :disabled="$store.selected.size == 0">Open</button>
-    </div>
-
-
-    <div class="container">
-        <button x-on:click="passwordWall = ! passwordWall" class="btn btn-primary my-5">Password Wall</button>
     </div>
 
     <script src="script.js"></script>

@@ -26,3 +26,24 @@ body.password-wall-active {
         max-width: 720px;
     }
 }
+
+input.new {
+    border: none;
+    padding-right: calc(var(--bs-gutter-x) * .5);
+    padding-left: calc(var(--bs-gutter-x) * .5);
+}
+
+input:disabled {
+    background-color: white;
+    color: #212529;
+}
+
+
+input.new:focus-visible{
+    background-color: -internal-light-dark(rgba(239, 239, 239, 0.3), rgba(59, 59, 59, 0.3));
+    outline: none;
+}
+
+a {
+    cursor: pointer;
+}
