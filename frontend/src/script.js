@@ -69,7 +69,7 @@ const determinePath = (router) => {
 
 const fetchBunch = async () => {
     
-    let response = await fetch(`/api/${Alpine.store('path')}`, {headers})
+    let response = await fetch(`https://api.abun.ch/${Alpine.store('path')}`, {headers})
     
     if (response.status === 401){
         let p = localStorage.getItem(Alpine.store('path'))
@@ -123,7 +123,7 @@ const openLinks = () => {
 }
 
 const sendClicked = (entry) => {
-    fetch(`/api/${Alpine.store('path')}/clicked/${entry.id}`, {method: 'POST', headers})
+    fetch(`https://api.abun.ch/${Alpine.store('path')}/clicked/${entry.id}`, {method: 'POST', headers})
     window.open(entry.url, '_blank')
 }
 
@@ -134,7 +134,7 @@ const usePassword = p =>{
 }
 
 const login = async (u, p) =>{
-    let response = await fetch('/api/login', { method: 'POST', body: JSON.stringify({password: p, username: u})})
+    let response = await fetch('https://api.abun.ch/login', { method: 'POST', body: JSON.stringify({password: p, username: u})})
     if (response.ok){
         Alpine.store('passwordWall', false)
     }
