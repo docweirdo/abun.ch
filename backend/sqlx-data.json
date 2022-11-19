@@ -1,0 +1,270 @@
+{
+  "db": "PostgreSQL",
+  "0261a06a21880b98ebcdfba2cc1c81c872f5f357bdcd67e5308bc9c2e3234297": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "password",
+          "ordinal": 1,
+          "type_info": "Bpchar"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT id, password FROM creator WHERE LOWER(username) = LOWER($1)"
+  },
+  "1416148c5a2ef40dcd9e0075804b985c23d4513fdce509aba08d4615cb9b4d2e": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "title",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "description",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "url",
+          "ordinal": 3,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        true,
+        true,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      }
+    },
+    "query": "SELECT id, title, description, url FROM entry WHERE bunch_id = $1"
+  },
+  "3ecd4fc3e63872fa3540e0f818e8415aa39ca6d3caacd4715686da24dc666265": {
+    "describe": {
+      "columns": [
+        {
+          "name": "username",
+          "ordinal": 0,
+          "type_info": "Varchar"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      }
+    },
+    "query": "SELECT username FROM creator WHERE id = $1"
+  },
+  "56b87d641e2289987ddc13ac96da0608de7c9746460491bcc49b23625112e3a2": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Varchar",
+          "Text",
+          "Int4"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO entry(title, description, url, clickcounter, bunch_id) \n            VALUES($1, $2, $3, 0, $4);"
+  },
+  "62ab49981ced095a122a4101ae5f4fd852c110303335142d04b427d18a046c04": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Bpchar"
+        ]
+      }
+    },
+    "query": "SELECT id FROM bunch WHERE uri = $1"
+  },
+  "8e1e5859026c5290b1fa5dce2a2d08fb380d9c9c28f2362be1811cfc1a348da6": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Varchar",
+          "Date",
+          "Bpchar",
+          "Bpchar",
+          "Bool",
+          "Bool",
+          "Int4"
+        ]
+      }
+    },
+    "query": "\n        INSERT INTO bunch(title, description, date, expiration, clickcounter, uri, password, open_graph, incognito, creator_id) \n        VALUES($1, $2, CURRENT_DATE, $3, 0, $4, $5, $6, $7, $8) RETURNING id;"
+  },
+  "93a3242d011b8f4c04d917fad589f0336c468527d39dc902e6a50ea0c0c84434": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "title",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "description",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "date",
+          "ordinal": 3,
+          "type_info": "Date"
+        },
+        {
+          "name": "open_graph",
+          "ordinal": 4,
+          "type_info": "Bool"
+        },
+        {
+          "name": "incognito",
+          "ordinal": 5,
+          "type_info": "Bool"
+        },
+        {
+          "name": "creator_id",
+          "ordinal": 6,
+          "type_info": "Int4"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Bpchar"
+        ]
+      }
+    },
+    "query": "SELECT id, title, description, date, open_graph, incognito, creator_id FROM bunch WHERE uri = $1"
+  },
+  "d53eac1dac370730982f2a578843e63c06069164fc5bd0dfd3ef72113badc39f": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Bpchar"
+        ]
+      }
+    },
+    "query": "SELECT COUNT(1) FROM bunch WHERE uri = $1"
+  },
+  "d7dc512510da5215869123f6b068bac657058aa12d2cf2664cfc155c13e8a29e": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int4"
+        ]
+      }
+    },
+    "query": "UPDATE entry SET clickcounter = clickcounter + 1 WHERE id = $1 AND bunch_id = $2;"
+  },
+  "d9183325795d34d1b91f1a9975b8357418b8db83469635dbb5e9279e435a8400": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      }
+    },
+    "query": "UPDATE bunch SET clickcounter = clickcounter + 1 WHERE id = $1"
+  },
+  "ecd32b1283f08633b103790a120bfbaee741db3fe17b4ffc971cea898fbd0e43": {
+    "describe": {
+      "columns": [
+        {
+          "name": "password",
+          "ordinal": 0,
+          "type_info": "Bpchar"
+        }
+      ],
+      "nullable": [
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Bpchar"
+        ]
+      }
+    },
+    "query": "SELECT password FROM bunch WHERE uri = $1"
+  }
+}
