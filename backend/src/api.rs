@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::db;
 use crate::db::AbunchDB;
 use pwhash::bcrypt;
@@ -8,7 +10,7 @@ use rocket::{
     post, routes, get,
     serde::json::Json,
     Build, Rocket,
-    time::Duration
+    time::Duration, options
 };
 use rocket_db_pools::Connection;
 use serde::{Deserialize, Serialize};
@@ -26,7 +28,8 @@ pub fn mount_endpoints(rocket: Rocket<Build>) -> Rocket<Build> {
         login, 
         bunch,
         clicked,
-        new_bunch
+        new_bunch,
+        cors_preflight
         ])
 }
 
@@ -93,6 +96,11 @@ pub async fn login(
     cookie_jar.add(Cookie::build("logged_in", "true").path("/").max_age(Duration::seconds(COOKIE_DURATION-1)).finish());
 
     Ok(())
+}
+
+#[options("/<_path..>")]
+pub fn cors_preflight(_path: PathBuf) -> Status{
+    Status::Ok
 }
 
 pub struct CreatorGuard(i32);

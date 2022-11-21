@@ -1,6 +1,6 @@
 use rocket::launch;
 use rocket_db_pools::{sqlx, Database};
-use crate::cors::CORS;
+use crate::cors::Cors;
 
 mod api;
 mod db;
@@ -15,7 +15,7 @@ pub struct AbunchDB(sqlx::PgPool);
 
 #[launch]
 fn rocket() -> _ {
-    let mut rocket = rocket::build().attach(AbunchDB::init()).attach(CORS);
+    let mut rocket = rocket::build().attach(AbunchDB::init()).attach(Cors);
     rocket = api::mount_endpoints(rocket);
     rocket
 }
