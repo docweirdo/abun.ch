@@ -30,4 +30,8 @@ creator: id, password, username, admin
 * Check expiration date before serving bunch (and delete)
 * worry about transactions
 * validate url in front and backend
-* check CORS
+* add placeholder with bootstrap
+* consider api caching
+* check localStorage for every uri before first 401 response
+* make meta robots tag conditional on route
+* set opengraph info 
