@@ -15,7 +15,13 @@ pub struct AbunchDB(sqlx::PgPool);
 
 #[launch]
 fn rocket() -> _ {
-    let mut rocket = rocket::build().attach(AbunchDB::init()).attach(Cors);
+    let mut rocket = rocket::build();
+    let figment = rocket.figment();
+
+    let cors_config: cors::Config = figment.extract_inner("cors").expect("custom");
+
+    rocket = rocket.attach(AbunchDB::init()).attach(Cors(cors_config));
+
     rocket = api::mount_endpoints(rocket);
     rocket
 }
