@@ -34,4 +34,7 @@ creator: id, password, username, admin
 * consider api caching
 * check localStorage for every uri before first 401 response
 * make meta robots tag conditional on route
-* set opengraph info 
+* set opengraph info (difficult without js)
+* enforce string lenghts in frontend
+* implement account creation via token
+* provide visual feedback for failed login

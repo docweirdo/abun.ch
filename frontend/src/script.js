@@ -1,10 +1,69 @@
 document.addEventListener('alpine:init', async () => {
-    Alpine.store('links', [])
     Alpine.store('passwordWall', false)
+
+    Alpine.effect(() => {
+        path = Alpine.$router.path;
+        console.log('router_effect')
+        // Open github issue because effect is fired for each fetch
+        if (global_path !== path){
+            global_path = path;
+            console.log('path_change')
+            path_change()
+        }
+    })
+})
+
+var global_path = ''
+
+function path_change(){
+    router = Alpine.$router;
+
+    if (router.is('/:uri([a-zA-Z0-9_-]{6})')) {
+        Alpine.store('state', 1)
+        set_uri(router.path.slice(1));
+    } else if (router.is('/new')){
+        Alpine.store('state', 2)
+        set_new();
+    }else {
+        Alpine.store('state', 0)
+        set_start();
+    }
+}
+
+function set_new(){    
+    console.log("set_new executed")
+    Alpine.store('links', [])
+    Alpine.store('bunch', new Bunch())
+    
+    let cookies = document.cookie.split(";");;
+    let found = false;
+
+    for (c of cookies){
+        if (c.split("=")[0] == 'logged_in') {
+            found = true;
+            break;
+        }
+    }
+
+    if (found) return;
+
+    Alpine.store('passwordWall', true);
+}
+
+async function set_uri(uri){
     Alpine.store('selected', new Map())
     Alpine.store('bunch', new Bunch())
-    Alpine.store('path', '')
-})
+
+    let bunch = await fetchBunch(uri);
+
+    Alpine.store('links', bunch.entries.map(e => Object.assign(new Link, e)))
+    Alpine.store('bunch', bunch)
+    window.bunch = Alpine.store('bunch')
+}
+
+function set_start(){
+    // TODO
+}
 
 let headers = new Headers();
 
@@ -16,8 +75,7 @@ class Bunch {
 
     constructor(){
         this.title = ''
-        this.description = null
-        this.username = null
+        this.description = ''
         this.open_graph = false,
         this.date = ''
     }
@@ -42,54 +100,26 @@ class Link {
     set title (t){
         this.titleVal = t;
     }
-}
+} 
 
-const determinePath = (router) => {
-
-    Alpine.store('path', router.path.slice(1))
-    
-    if (router.is('/:uri([a-zA-Z0-9_-]{6})')) {
-        fetchBunch()
-    } else if (router.is('/new')){
-        let cookies = document.cookie.split(";");;
-        let found = false;
-
-        for (c of cookies){
-            if (c.split("=")[0] == 'logged_in') {
-                found = true;
-                break;
-            }
-        }
-
-        if (found) return;
-
-        Alpine.store('passwordWall', true); 
-    }
-}; 
-
-const fetchBunch = async () => {
-    
-    let response = await fetch(`https://api.abun.ch/${Alpine.store('path')}`, {headers})
+const fetchBunch = async (uri) => {
+    let response = await fetch(`https://api.abun.ch/${uri}`, {headers})
     
     if (response.status === 401){
-        let p = localStorage.getItem(Alpine.store('path'))
+        let p = localStorage.getItem(uri)
         if (p){
             usePassword(p)
             return;
         }
-
         Alpine.store('passwordWall', true)
         return;
     }
     Alpine.store('passwordWall', false)
-
+    
     let bunch = await response.json()
-
-    window.bunch = bunch
     bunch = Object.assign(new Bunch, bunch);
     
-    Alpine.store('links', bunch.entries.map(e => Object.assign(new Link, e)))
-    Alpine.store('bunch', bunch)
+    return bunch;
 }
 
 

@@ -17,57 +17,59 @@
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css?v=1.0">
 
-    <script defer src="https://unpkg.com/@shaun/alpinejs-router@1.2.12/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/@shaun/alpinejs-router@1.2.13/dist/cdn.min.js"></script>
+    <script defer src="script.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 </head>
 
-<body x-data="{get route_new() {return $store.path === 'new'}}" x-init="determinePath($router)" :class="$store.passwordWall && 'password-wall-active'">
+<body x-data :class="$store.passwordWall && 'password-wall-active'">
     <div x-data="{
         passwordVal: '', 
         usernameVal: '',
 
         submit(){
-            route_new ? login(this.usernameVal, this.passwordVal) : usePassword(this.passwordVal)
+            $store.state == 1 ? usePassword(this.passwordVal) : login(this.usernameVal, this.passwordVal)
         }
 
     }" :class="$store.passwordWall && 'password-wall-active d-flex'" class=" align-items-center justify-content-center"
         id="password-wall">
-        <form action="" method="post" x-data :autocomplete="route_new ? 'on' : 'off'">
+        <form action="" method="post" x-data :autocomplete="$store.state == 2 ? 'on' : 'off'">
             <div class="mb-3">
-                <label x-show="route_new" for="username" class="form-label">Username</label>
-                <input x-show="route_new" type="text" class="form-control mb-2" id="username" x-model="usernameVal">
+                <label x-data x-show="$store.state == 2" for="username" class="form-label">Username</label>
+                <input x-data x-show="$store.state == 2" type="text" class="form-control mb-2" id="username" x-model="usernameVal">
                 <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-control" id="password" x-model="passwordVal" @keyup.enter="submit()">
-                <div x-show="!route_new" id="bunch-password-help" class="form-text">Ask the person who's shared this link.</div>
+                <div x-data x-show="$store.state == 1" id="bunch-password-help" class="form-text">Ask the person who's shared this link.</div>
             </div>
             <div class="d-flex justify-content-center">
-                <button x-on:click="submit()" type="button" class="btn btn-primary">Log in</button>
+                <button x-data x-on:click="submit()" type="button" class="btn btn-primary">Log in</button>
             </div>
         </form>
     </div>
 
     <div class="container">
         <div class="row py-5 justify-content-center justify-content-sm-start">
-            <input class="col-sm h2 d-flex justify-content-sm-start justify-content-center new" id="bunch-title" x-model="$store.bunch.title" :disabled="!route_new" placeholder="Title">
+            <input x-data class="col-sm h2 d-flex justify-content-sm-start justify-content-center new" id="bunch-title" x-model="$store.bunch.title" :disabled="$store.state != 2" placeholder="Title">
             </input>
-            <div class="col-auto align-self-center" id="bunch-date-author" x-show="!route_new">
+            <div x-data class="col-auto align-self-center" id="bunch-date-author" x-show="$store.state == 1">
                 <div class="row">
                     <div class="col">from:</div>
-                    <div class="col d-flex justify-content-end" id="bunch-date" x-text="$store.bunch.date"></div>
+                    <div x-data class="col d-flex justify-content-end" id="bunch-date" x-text="$store.bunch.date"></div>
                 </div>
-                <div class="row" x-show="$store.bunch.username">
+                <div x-data class="row" x-show="$store.bunch.username">
                     <div class="col">by:</div>
-                    <div class="col d-flex justify-content-end" id="bunch-creator" x-text="$store.bunch.username"></div>
+                    <div x-data class="col d-flex justify-content-end" id="bunch-creator" x-text="$store.bunch.username"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card container bg-light" x-show="$store.bunch.description || route_new">
+    <div class="card container bg-light" x-show="$store.bunch.description || $store.state == 2">
         <div class="card-body">
-            <h6 x-show="!route_new" class="card-title">Description</h6>
-            <input class="new bg-light" id="bunch-description" x-model="$store.bunch.description" placeholder="Description" :disabled="!route_new">
+            <h6 x-data x-show="$store.state == 1" class="card-title">Description</h6>
+            <textarea x-data x-show="$store.state == 2" class="new bg-light" id="bunch-description" x-model="$store.bunch.description" placeholder="Description" x-init="$watch('$store.bunch.description', d => $el.style.height = $el.scrollHeight + 'px')"></textarea>
+            <p x-data x-show="$store.state == 1" class="new bg-light" id="bunch-description" x-text="$store.bunch.description"></p>
             </div>
         </div>
     </div>
@@ -76,16 +78,16 @@
 
     <div class="container" id="link-container">
         <ul class="list-group list-group-flush">
-            <li class="list-group-item" id="link-list-header" x-show="!route_new">
+            <li x-data class="list-group-item" id="link-list-header" x-show="$store.state == 1">
                 <input x-on:click="selectAll($el)" class="form-check-input" type="checkbox" value=""
                     id="select-all-checkbox">
             </li>
-            <template x-for="entry in $store.links" :key="entry.id">
+            <template x-data x-for="entry in $store.links" :key="entry.id">
                 <li class="list-group-item">
                     <input
                         @click="if ($el.checked) $store.selected.set(entry.id, entry); else $store.selected.delete(entry.id)"
                         class="form-check-input me-3" type="checkbox" value="">
-                    <a @click="sendClicked(entry)" class="link-dark link-list-link" x-text="entry.title"></a>
+                    <a x-data @click="sendClicked(entry)" class="link-dark link-list-link" x-text="entry.title"></a>
                 </li>
             </template>
         </ul>
@@ -94,10 +96,10 @@
 
 
     <div class="container d-flex justify-content-end">
-        <button x-on:click="openLinks" class="btn btn-primary mt-3" :disabled="$store.selected.size == 0">Open</button>
+        <template x-data x-if="$store.state == 1">
+            <button x-data x-on:click="openLinks" class="btn btn-primary mt-3" :disabled="$store.selected.size == 0">Open</button>
+        </template>
     </div>
-
-    <script src="script.js"></script>
 </body>
 
 </html>

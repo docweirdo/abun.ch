@@ -31,11 +31,15 @@ input.new {
     border: none;
     padding-right: calc(var(--bs-gutter-x) * .5);
     padding-left: calc(var(--bs-gutter-x) * .5);
+    box-sizing: content-box;
 }
 
-input:disabled {
+input:disabled, textarea, textarea:focus-visible{
     background-color: white;
     color: #212529;
+    border: none;
+    resize: none;
+    outline: none;
 }
 
 
