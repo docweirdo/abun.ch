@@ -58,7 +58,6 @@ async function set_uri(uri){
 
     Alpine.store('links', bunch.entries.map(e => Object.assign(new Link, e)))
     Alpine.store('bunch', bunch)
-    window.bunch = Alpine.store('bunch')
 }
 
 function set_start(){
@@ -108,8 +107,7 @@ const fetchBunch = async (uri) => {
     if (response.status === 401){
         let p = localStorage.getItem(uri)
         if (p){
-            usePassword(p)
-            return;
+            return usePassword(p)
         }
         Alpine.store('passwordWall', true)
         return;
@@ -118,7 +116,7 @@ const fetchBunch = async (uri) => {
     
     let bunch = await response.json()
     bunch = Object.assign(new Bunch, bunch);
-    
+
     return bunch;
 }
 
@@ -158,7 +156,6 @@ const sendClicked = (entry) => {
 }
 
 const usePassword = p =>{
-    localStorage.setItem(Alpine.store('path'), p);
     headers.set('Authorization', p); 
     fetchBunch();
 }
