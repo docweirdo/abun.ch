@@ -50,8 +50,13 @@
 
     <div class="container">
         <div class="row py-5 justify-content-center justify-content-sm-start">
-            <input x-data class="col-sm h2 d-flex justify-content-sm-start justify-content-center new" id="bunch-title" x-model="$store.bunch.title" :disabled="$store.state != 2" placeholder="Title">
-            </input>
+            <template x-if="$store.state == 1">
+                <h2 x-data class="col-sm d-flex justify-content-sm-start justify-content-center new" id="bunch-title" x-text="$store.bunch.title">
+            </template>
+            <template x-if="$store.state == 2">
+                <input x-data class="col-sm d-flex h2 justify-content-sm-start justify-content-center new" id="bunch-title" x-model="$store.bunch.title" placeholder="Title">
+            </template>
+            </h2>
             <div x-data class="col-auto align-self-center" id="bunch-date-author" x-show="$store.state == 1">
                 <div class="row">
                     <div class="col">from:</div>
@@ -92,8 +97,6 @@
             </template>
         </ul>
     </div>
-
-
 
     <div class="container d-flex justify-content-end">
         <template x-data x-if="$store.state == 1">

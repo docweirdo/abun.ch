@@ -25,6 +25,20 @@ body.password-wall-active {
     .container {
         max-width: 720px;
     }
+
+}
+
+@media (max-width: 575.98px) {
+    h2#bunch-title {
+        text-align: center;
+        white-space: normal;
+    }
+}
+@media (min-width: 576px) {
+    h2#bunch-title {
+        text-align: start;
+        white-space: nowrap;
+    }
 }
 
 input.new {
@@ -34,14 +48,14 @@ input.new {
     box-sizing: content-box;
 }
 
-input:disabled, textarea, textarea:focus-visible{
+textarea, textarea:focus-visible{
     background-color: white;
     color: #212529;
     border: none;
     resize: none;
     outline: none;
+    width: 100%;
 }
-
 
 input.new:focus-visible{
     background-color: -internal-light-dark(rgba(239, 239, 239, 0.3), rgba(59, 59, 59, 0.3));
