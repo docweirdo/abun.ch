@@ -11,9 +11,9 @@ document.addEventListener('alpine:init', async () => {
 })
 
 function path_change(){
-    router = Alpine.$router;
+    //router = Alpine.$router;
 
-    if (router.is('/:uri([a-zA-Z0-9_-]{6})')) {
+    /*if (router.is('/:uri([a-zA-Z0-9_-]{6})')) {
         Alpine.store('state', 1)
         set_uri(router.path.slice(1));
     } else if (router.is('/new')){
@@ -22,12 +22,14 @@ function path_change(){
     }else {
         Alpine.store('state', 0)
         set_start();
-    }
+    }*/
+
+    Alpine.store('state', 2)
+    set_new();
 }
 
 function set_new(){    
     Alpine.store('links', [])
-    Alpine.store('bunch', new Bunch())
 
     let cookies = document.cookie.split(";");;
     let found = false;
