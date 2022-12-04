@@ -44,7 +44,6 @@ input.new {
     border: none;
     padding-right: calc(var(--bs-gutter-x) * .5);
     padding-left: calc(var(--bs-gutter-x) * .5);
-    box-sizing: content-box;
 }
 
 textarea, textarea:focus-visible{

@@ -99,8 +99,37 @@
     </div>
 
     <div class="container d-flex justify-content-end">
-        <template x-data x-if="$store.state == 1">
-            <button x-data x-on:click="openLinks" class="btn btn-primary mt-3" :disabled="$store.selected.size == 0">Open</button>
+        <template x-data x-if="$store.state != 0">
+            <button x-data="{
+                button_text(){
+                    switch ($store.state) {
+                        case 1:
+                        return 'Open'
+                        case 2:
+                        return 'Create'
+                    }
+                },
+
+                button_click(){
+                    switch ($store.state) {
+                        case 1:
+                            openLinks()
+                            break;
+                        case 2:
+                            createNew()
+                            break;
+                    }
+                },
+                
+                button_disabled(){
+                    switch ($store.state) {
+                        case 1:
+                            return $store.selected.size == 0
+                        case 2:
+                            return $store.links.length <= 0;
+                    }
+                }
+            }" x-on:click="button_click()" class="btn btn-primary mt-3" :disabled="button_disabled()" x-text="button_text()"></button>
         </template>
     </div>
 </body>
