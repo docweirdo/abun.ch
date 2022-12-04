@@ -1,19 +1,14 @@
 document.addEventListener('alpine:init', async () => {
     Alpine.store('passwordWall', false)
 
+    Alpine.store('bunch', new Bunch()) // init here because within effect triggers loop
+
     Alpine.effect(() => {
         path = Alpine.$router.path;
         console.log('router_effect')
-        // Open github issue because effect is fired for each fetch
-        if (global_path !== path){
-            global_path = path;
-            console.log('path_change')
-            path_change()
-        }
+        path_change()
     })
 })
-
-var global_path = ''
 
 function path_change(){
     router = Alpine.$router;
@@ -31,10 +26,9 @@ function path_change(){
 }
 
 function set_new(){    
-    console.log("set_new executed")
     Alpine.store('links', [])
     Alpine.store('bunch', new Bunch())
-    
+
     let cookies = document.cookie.split(";");;
     let found = false;
 
@@ -52,7 +46,6 @@ function set_new(){
 
 async function set_uri(uri){
     Alpine.store('selected', new Map())
-    Alpine.store('bunch', new Bunch())
 
     let bunch = await fetchBunch(uri);
 
