@@ -37,7 +37,6 @@ body.password-wall-active {
 @media (min-width: 576px) {
     h2#bunch-title {
         text-align: start;
-        white-space: nowrap;
     }
 }
 
