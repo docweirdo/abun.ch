@@ -23,7 +23,7 @@
 
 </head>
 
-<body x-data :class="$store.passwordWall && 'password-wall-active'">
+<body x-data :class="$store.passwordWall.value && 'password-wall-active'">
     <div x-data="{
         passwordVal: '', 
         usernameVal: '',
@@ -32,14 +32,14 @@
             $store.state == 1 ? usePassword(this.passwordVal) : login(this.usernameVal, this.passwordVal)
         }
 
-    }" :class="$store.passwordWall && 'password-wall-active d-flex'" class=" align-items-center justify-content-center"
+    }" :class="$store.passwordWall.value && 'password-wall-active d-flex'" class=" align-items-center justify-content-center"
         id="password-wall">
         <form action="" method="post" x-data :autocomplete="$store.state == 2 ? 'on' : 'off'">
             <div class="mb-3">
                 <label x-data x-show="$store.state == 2" for="username" class="form-label">Username</label>
                 <input x-data x-show="$store.state == 2" type="text" class="form-control mb-2" id="username" x-model="usernameVal">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" x-model="passwordVal" @keyup.enter="submit()">
+                <input type="password" class="form-control" id="password" x-model="passwordVal" :autocomplete="$store.state == 1 ? 'new-password' : 'on'" :readonly="$store.state == 1" onfocus="this.removeAttribute('readonly');" @keyup.enter="submit()">
                 <div x-data x-show="$store.state == 1" id="bunch-password-help" class="form-text">Ask the person who's shared this link.</div>
             </div>
             <div class="d-flex justify-content-center">

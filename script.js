@@ -1,7 +1,8 @@
 document.addEventListener('alpine:init', async () => {
-    Alpine.store('passwordWall', false)
+    Alpine.store('passwordWall', {value: false}) // object because of fucked up simple stores
 
     Alpine.store('bunch', new Bunch()) // init here because within effect triggers loop
+    Alpine.store('selected', new Map())
 
     Alpine.effect(() => {
         path = Alpine.$router.path;
@@ -11,9 +12,9 @@ document.addEventListener('alpine:init', async () => {
 })
 
 function path_change(){
-    //router = Alpine.$router;
+    router = Alpine.$router;
 
-    /*if (router.is('/:uri([a-zA-Z0-9_-]{6})')) {
+    if (router.is('/:uri([a-zA-Z0-9_-]{6})')) {
         Alpine.store('state', 1)
         set_uri(router.path.slice(1));
     } else if (router.is('/new')){
@@ -22,10 +23,7 @@ function path_change(){
     }else {
         Alpine.store('state', 0)
         set_start();
-    }*/
-
-    Alpine.store('state', 2)
-    set_new();
+    }
 }
 
 function set_new(){    
@@ -43,13 +41,25 @@ function set_new(){
 
     if (found) return;
 
-    Alpine.store('passwordWall', true);
+    Alpine.store('passwordWall').value = true;
 }
 
 async function set_uri(uri){
-    Alpine.store('selected', new Map())
 
-    let bunch = await fetchBunch(uri);
+    password = localStorage.getItem(uri);
+    let bunch;
+
+    try {
+        if (password){
+            headers.set('Authorization', password);
+        }
+        bunch = await fetchBunch(uri);
+    } catch (error) {
+        Alpine.store('passwordWall').value = true;
+        localStorage.removeItem(uri)
+        return;
+    }
+    Alpine.store('passwordWall').value = false;
 
     Alpine.store('links', bunch.entries.map(e => Object.assign(new Link, e)))
     Alpine.store('bunch', bunch)
@@ -100,14 +110,8 @@ const fetchBunch = async (uri) => {
     let response = await fetch(`https://api.abun.ch/${uri}`, {headers})
     
     if (response.status === 401){
-        let p = localStorage.getItem(uri)
-        if (p){
-            return usePassword(p)
-        }
-        Alpine.store('passwordWall', true)
-        return;
+        return Promise.reject('unauthorized');
     }
-    Alpine.store('passwordWall', false)
     
     let bunch = await response.json()
     bunch = Object.assign(new Bunch, bunch);
@@ -150,14 +154,16 @@ const sendClicked = (entry) => {
     window.open(entry.url, '_blank')
 }
 
-const usePassword = p =>{
-    headers.set('Authorization', p); 
-    fetchBunch();
+const usePassword = p => {
+    let uri = Alpine.$router.path.slice(1);
+
+    localStorage.setItem(uri, p)
+    set_uri(uri)
 }
 
 const login = async (u, p) =>{
     let response = await fetch('https://api.abun.ch/login', { method: 'POST', body: JSON.stringify({password: p, username: u})})
     if (response.ok){
-        Alpine.store('passwordWall', false)
+        Alpine.store('passwordWall').value = false;
     }
 }
