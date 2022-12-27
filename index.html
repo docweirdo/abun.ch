@@ -39,7 +39,12 @@
                 <label x-data x-show="$store.state == 2" for="username" class="form-label">Username</label>
                 <input x-data x-show="$store.state == 2" type="text" class="form-control mb-2" id="username" x-model="usernameVal">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" x-model="passwordVal" :autocomplete="$store.state == 1 ? 'new-password' : 'on'" :readonly="$store.state == 1" onfocus="this.removeAttribute('readonly');" @keyup.enter="submit()">
+                <template x-if="$store.state == 1">
+                    <input x-data  type="password" class="form-control" id="otp-password" name="otp-password" x-model="passwordVal" autocomplete="one-time-code" @keyup.enter="submit" >
+                </template>
+                <template x-if="$store.state == 2">
+                    <input x-data x-if="$store.state == 2" type="password" class="form-control" id="login-password" name="login-password" x-model="passwordVal" autocomplete="current-password" @keyup.enter="submit" >
+                </template>
                 <div x-data x-show="$store.state == 1" id="bunch-password-help" class="form-text">Ask the person who's shared this link.</div>
             </div>
             <div class="d-flex justify-content-center">
