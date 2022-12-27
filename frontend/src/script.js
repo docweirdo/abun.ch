@@ -11,8 +11,14 @@ document.addEventListener('alpine:init', async () => {
     })
 })
 
+// Global State
+let headers;
+let failedTries;
+
 function path_change(){
     router = Alpine.$router;
+    headers = new Headers();
+    failedTries = 0;
 
     if (router.is('/:uri([a-zA-Z0-9_-]{6})')) {
         Alpine.store('state', 1)
@@ -45,7 +51,6 @@ function set_new(){
 }
 
 async function set_uri(uri){
-
     password = localStorage.getItem(uri);
     let bunch;
 
@@ -55,11 +60,19 @@ async function set_uri(uri){
         }
         bunch = await fetchBunch(uri);
     } catch (error) {
+        failedTries +=1
+
         Alpine.store('passwordWall').value = true;
         localStorage.removeItem(uri)
+        
+        if (failedTries == 2){
+            document.getElementById('otp-password').classList.add('is-invalid')
+        }
         return;
     }
     Alpine.store('passwordWall').value = false;
+    document.getElementById('otp-password').classList.remove('is-invalid');
+    failedTries = 0;
 
     Alpine.store('links', bunch.entries.map(e => Object.assign(new Link, e)))
     Alpine.store('bunch', bunch)
@@ -68,8 +81,6 @@ async function set_uri(uri){
 function set_start(){
     // TODO
 }
-
-let headers = new Headers();
 
 class Bunch {
     title;
