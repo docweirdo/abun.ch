@@ -1,8 +1,8 @@
 use pwhash::bcrypt;
 use rocket_db_pools::Connection;
-use sqlx::{query, query_as};
+use sqlx::{query, query_as, pool::PoolConnection, Postgres};
 
-use crate::{error::AbunchError, bunch_url::BunchURL, model::{Bunch, Entry, NewBunch}};
+use crate::{error::AbunchError, identifier::{BunchURL, AccountToken}, model::{Bunch, Entry, NewBunch, NewAccount}};
 pub use crate::AbunchDB;
 
 pub async fn verify_user(
@@ -108,4 +108,30 @@ pub async fn new_bunch(new_bunch: NewBunch, creator_id : i32, mut conn: Connecti
     
 
     Ok(uri)
+}
+
+pub async fn get_token_validity(token: AccountToken, mut conn: Connection<AbunchDB>) -> Result<(bool, bool), AbunchError>{
+
+    let token_record = query!("SELECT valid, admin FROM token WHERE id = $1;", token.to_string()).fetch_one(&mut *conn).await?;
+
+    Ok((token_record.valid, token_record.admin))
+}
+
+pub async fn invalidate_token(token: &str, conn: &mut PoolConnection<Postgres>) -> Result<(), AbunchError>{
+
+    query!("UPDATE token SET valid = FALSE WHERE id = $1;", token).execute(conn).await?;
+
+    Ok(())
+}
+
+pub async fn new_account(new_account: NewAccount, mut conn: Connection<AbunchDB>) -> Result<i32, AbunchError>{
+
+    let pw_hash = bcrypt::hash(new_account.password)?;
+
+    let result = query!("
+                INSERT INTO creator(username, password, admin) VALUES ($1, $2, $3) RETURNING ID;", 
+                new_account.username, pw_hash, new_account.admin.unwrap())
+                .fetch_one(&mut *conn).await?;
+
+    Ok(result.id)
 }

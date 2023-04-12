@@ -39,3 +39,4 @@ creator: id, password, username, admin
 * implement account creation via token
 * provide visual feedback for failed login
 * shorten max title or break to center title mode at md not sm
+* worry about crsf

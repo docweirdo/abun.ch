@@ -10,16 +10,18 @@ use rocket::{
     post, routes, get,
     serde::json::Json,
     Build, Rocket,
-    time::Duration, options
+    time::Duration, options, response::Redirect, uri
 };
 use rocket_db_pools::Connection;
 use serde::{Deserialize, Serialize};
 
 
 use crate::error::AbunchError;
-use crate::bunch_url::BunchURL;
+use crate::identifier::BunchURL;
+use crate::identifier::AccountToken;
 use crate::model::Bunch;
 use crate::model::NewBunch;
+use crate::model::NewAccount;
 
 const COOKIE_DURATION: i64 = 20 * 60; // 20 mins
 
@@ -29,6 +31,7 @@ pub fn mount_endpoints(rocket: Rocket<Build>) -> Rocket<Build> {
         bunch,
         clicked,
         new_bunch,
+        create_account,
         cors_preflight
         ])
 }
@@ -51,6 +54,17 @@ pub async fn new_bunch(creator: CreatorGuard, new_bunch: NewBunch, conn: Connect
     let uri = db::new_bunch(new_bunch, creator.0, conn).await?;
     Ok(Json(uri.to_string()))
 }
+
+#[post("/create_account", data = "<new_account>")]
+pub async fn create_account(new_account: NewAccount, mut conn: Connection<AbunchDB>) -> Result<(), AbunchError>{
+    
+    db::invalidate_token(&new_account.token, &mut conn).await?;
+
+    db::new_account(new_account, conn).await?;
+
+    Ok(())
+}
+
 
 #[derive(Serialize, Deserialize)]
 pub struct Credentials {
@@ -198,6 +212,54 @@ impl<'r> FromData<'r> for NewBunch {
         }
 
         data::Outcome::Success(new_bunch)
+
+    }
+}
+
+#[rocket::async_trait]
+impl<'r> FromData<'r> for NewAccount {
+    type Error = AbunchError;
+
+    async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> data::Outcome<'r, Self> {
+
+        let request::Outcome::Success(conn) = req.guard::<Connection<AbunchDB>>().await else{
+            return data::Outcome::Failure((Status::InternalServerError, AbunchError::StatusCode(500)));
+        };
+        
+        let limit = req.limits().get("new_account").unwrap_or_else(|| 512_i32.bytes());
+
+        let string = match data.open(limit).into_string().await {
+            Ok(string) if string.is_complete() => string.into_inner(),
+            Ok(_) => return data::Outcome::Failure((Status::PayloadTooLarge, AbunchError::StatusCode(413))),
+            Err(_) => return data::Outcome::Failure((Status::InternalServerError, AbunchError::StatusCode(500))),
+        };
+
+        let mut new_account = match serde_json::from_str::<NewAccount>(&string){
+            Ok(n) => n,
+            Err(e) => return data::Outcome::Failure((Status::BadRequest, AbunchError::SerdeError(e)))
+        };
+
+        if new_account.username.chars().count() > 15 {
+            return data::Outcome::Failure((Status::BadRequest, AbunchError::StatusCode(400)));
+        }
+
+        if new_account.password.chars().count() > 20 {
+            return data::Outcome::Failure((Status::BadRequest, AbunchError::StatusCode(400)));
+        }
+
+        let token = match AccountToken::try_from(new_account.token.to_owned()){
+            Ok(t) => t,
+            Err(e) => return data::Outcome::Failure((Status::BadRequest, e))
+        };
+
+        match db::get_token_validity(token, conn).await{
+            Ok((true, admin)) => {
+                new_account.admin = Some(admin);
+                data::Outcome::Success(new_account)
+            },
+            Ok((false, _)) => data::Outcome::Failure((Status::Unauthorized, AbunchError::InvalidToken(new_account.token))),
+            Err(e) => data::Outcome::Failure((Status::InternalServerError, e))
+        }
 
     }
 }

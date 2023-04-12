@@ -12,6 +12,9 @@ pub enum AbunchError {
     #[error(transparent)]
     SerdeError(#[from] serde_json::Error),
 
+    #[error(transparent)]
+    BcryptError(#[from] pwhash::error::Error),
+
     #[error("status code: {0}")]
     #[allow(dead_code)]
     StatusCode(u16),
@@ -21,10 +24,16 @@ pub enum AbunchError {
 
     #[error("can't convert {0} to BunchURL")]
     BunchURL(String),
+
+    #[error("token {0} invalid")]
+    InvalidToken(String)
 }
 
 impl<'r, 'o: 'r> Responder<'r, 'o> for AbunchError {
     fn respond_to(self, req: &'r Request<'_>) -> response::Result<'o> {
+
+        println!("{self}");
+
         match self {
             AbunchError::StatusCode(code) => Status::from_code(code).respond_to(req),
             AbunchError::WrongPassword(_) => Status::Unauthorized.respond_to(req),

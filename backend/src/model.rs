@@ -42,3 +42,11 @@ pub struct NewEntry{
     pub title: Option<String>,
     pub description: Option<String>
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct NewAccount{
+    pub username: String,
+    pub password: String,       //this was Option<String>, why?
+    pub admin: Option<bool>,
+    pub token: String
+}
