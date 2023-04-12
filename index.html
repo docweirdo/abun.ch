@@ -19,8 +19,9 @@
 
     <script defer src="https://unpkg.com/@shaun/alpinejs-router@1.2.13/dist/cdn.min.js"></script>
     <script defer src="script.js"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script type="module"> import normalizeUrl from "https://cdn.jsdelivr.net/npm/normalize-url@8.0.0/+esm"; window.normalizeUrl = normalizeUrl;</script>
+    <script nomodule>window.normalizeUrl = url => url</script>
 </head>
 
 <body x-data :class="$store.passwordWall.value && 'password-wall-active'">
@@ -43,7 +44,7 @@
                     <input x-data  type="password" class="form-control" id="otp-password" name="otp-password" x-model="passwordVal" autocomplete="one-time-code" @keyup.enter="submit" >
                 </template>
                 <template x-if="$store.state == 2">
-                    <input x-data x-if="$store.state == 2" type="password" class="form-control" id="login-password" name="login-password" x-model="passwordVal" autocomplete="current-password" @keyup.enter="submit" >
+                    <input x-data type="password" class="form-control" id="login-password" name="login-password" x-model="passwordVal" autocomplete="current-password" @keyup.enter="submit" >
                 </template>
                 <div x-data x-show="$store.state == 1" id="bunch-password-help" class="form-text">Ask the person who's shared this link.</div>
             </div>
@@ -54,7 +55,7 @@
     </div>
 
     <div class="container">
-        <div class="row py-5 justify-content-center justify-content-sm-start">
+        <div class="row py-5 justify-content-center">
             <template x-if="$store.state == 1">
                 <h2 x-data class="col-sm d-flex justify-content-sm-start justify-content-center new" id="bunch-title" x-text="$store.bunch.title">
             </template>
@@ -87,23 +88,42 @@
     <div class="my-5"></div>
 
     <div class="container" id="link-container">
-        <ul class="list-group list-group-flush">
-            <li x-data class="list-group-item" id="link-list-header" x-show="$store.state == 1">
-                <input x-on:click="selectAll($el)" class="form-check-input" type="checkbox" value=""
-                    id="select-all-checkbox">
-            </li>
-            <template x-data x-for="entry in $store.links" :key="entry.id">
-                <li class="list-group-item">
-                    <input
-                        @click="if ($el.checked) $store.selected.set(entry.id, entry); else $store.selected.delete(entry.id)"
-                        class="form-check-input me-3" type="checkbox" value="">
-                    <a x-data @click="sendClicked(entry)" class="link-dark link-list-link" x-text="entry.title"></a>
+        
+        <template x-data x-if="$store.state == 1">
+            <div>
+                <ul class="list-group list-group-flush">
+                    <li x-data class="list-group-item" id="link-list-header" x-show="$store.state == 1">
+                        <input x-on:click="selectAll($el)" class="form-check-input" type="checkbox" value=""
+                            id="select-all-checkbox">
+                    </li>
+                    <template x-data x-for="entry in $store.links.value" :key="entry.id">
+                        <li class="list-group-item">
+                            <input
+                                @click="if ($el.checked) $store.selected.set(entry.id, entry); else $store.selected.delete(entry.id)"
+                                class="form-check-input me-3" type="checkbox" value="">
+                            <a x-data @click="sendClicked(entry)" class="link-dark link-list-link" x-text="entry.title"></a>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+        </template>
+        
+        <template x-data x-if="$store.state == 2">
+            <ul class="list-group list-group-flush">
+                <template x-data x-for="entry in $store.links.value" :key="entry.id">
+                    <li class="list-group-item new">
+                        <a x-data class="link-dark link-list-link" x-text="entry.title" :href="entry.url" target="_blank"></a>
+                    </li>
+                </template>
+                <li class="list-group-item new">
+                    <input x-data="{newEntry: ''}" class="form-text link-dark me-3" placeholder="example.com Title" x-model="newEntry" @keyup.enter="parseNewEntry(newEntry); newEntry=''">
                 </li>
-            </template>
-        </ul>
+            </ul>
+        </template>
+
     </div>
 
-    <div class="container d-flex justify-content-end">
+    <div class="container d-flex justify-content-sm-end justify-content-center">
         <template x-data x-if="$store.state != 0">
             <button x-data="{
                 button_text(){

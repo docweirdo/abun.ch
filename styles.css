@@ -33,6 +33,11 @@ body.password-wall-active {
         text-align: center;
         white-space: normal;
     }
+    div.card.container {
+        border-right: 0cm;
+        border-left: 0cm;
+        border-radius: 0;
+    }
 }
 @media (min-width: 576px) {
     h2#bunch-title {
@@ -58,6 +63,18 @@ textarea, textarea:focus-visible{
 input.new:focus-visible{
     background-color: -internal-light-dark(rgba(239, 239, 239, 0.3), rgba(59, 59, 59, 0.3));
     outline: none;
+}
+
+li.new {
+    padding: 0.2rem 0rem;
+    margin: 0rem 1rem;
+}
+
+li > input.form-text{
+    border-width: 0;
+    background-color: -internal-light-dark(rgba(239, 239, 239, 0.3), rgba(59, 59, 59, 0.3));
+    outline: none;
+    width: 100%;
 }
 
 a {

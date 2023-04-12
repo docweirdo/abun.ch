@@ -33,7 +33,7 @@ function path_change(){
 }
 
 function set_new(){    
-    Alpine.store('links', [])
+    Alpine.store('links', {value: []})
 
     let cookies = document.cookie.split(";");;
     let found = false;
@@ -74,7 +74,7 @@ async function set_uri(uri){
     document.getElementById('otp-password').classList.remove('is-invalid');
     failedTries = 0;
 
-    Alpine.store('links', bunch.entries.map(e => Object.assign(new Link, e)))
+    Alpine.store('links', {value: bunch.entries.map(e => Object.assign(new Link, e))})
     Alpine.store('bunch', bunch)
 }
 
@@ -107,7 +107,14 @@ class Bunch {
 class Link {
     description;
     url;
+    id;
 
+    constructor(id, url, t, description){
+        this.titleVal = t;
+        this.url = url;
+        this.description = description;
+        this.id = id;
+    }
 
     get title (){
         return this.titleVal ? this.titleVal : this.url
@@ -140,8 +147,10 @@ const selectAll = e => {
 
     let map = Alpine.store('selected');
 
+    let links = Alpine.store('links').value
+
     if (e.checked) {
-        for (const link of Alpine.store('links')) {
+        for (const link of links) {
             map.set(link.id, link);
         }
     } else {
@@ -172,9 +181,35 @@ const usePassword = p => {
     set_uri(uri)
 }
 
-const login = async (u, p) =>{
+const login = async (u, p) => {
     let response = await fetch('https://api.abun.ch/login', { method: 'POST', body: JSON.stringify({password: p, username: u})})
     if (response.ok){
         Alpine.store('passwordWall').value = false;
     }
+}
+
+let newLinkID = 0;
+
+const parseNewEntry = (newEntry) => {
+    // parse entry
+    newEntry = newEntry.trim();
+    let index = newEntry.search(/\s+/)
+
+    index = index == -1 ? newEntry.length+1 : index
+    
+    let url = newEntry.slice(0, index);
+
+    if (url.length < 1) return;
+
+    let title;
+
+    if (index <= newEntry.length){
+        title = newEntry.slice(index).trim();
+    }
+
+    let parsedEntry = new Link(newLinkID, window.normalizeUrl(url), title) // TODO: description
+    newLinkID = newLinkID + 1;
+
+    let links = Alpine.store('links').value;
+    links.push(parsedEntry)
 }
