@@ -10,7 +10,7 @@ use rocket::{
     post, routes, get,
     serde::json::Json,
     Build, Rocket,
-    time::Duration, options, response::Redirect, uri
+    time::Duration, options
 };
 use rocket_db_pools::Connection;
 use serde::{Deserialize, Serialize};
@@ -28,6 +28,7 @@ const COOKIE_DURATION: i64 = 20 * 60; // 20 mins
 pub fn mount_endpoints(rocket: Rocket<Build>) -> Rocket<Build> {
     rocket.mount("/", routes![
         login, 
+        logout,
         bunch,
         clicked,
         new_bunch,
@@ -110,6 +111,12 @@ pub async fn login(
     cookie_jar.add(Cookie::build("logged_in", "true").path("/").max_age(Duration::seconds(COOKIE_DURATION-1)).finish());
 
     Ok(())
+}
+
+#[post("/logout")]
+pub async fn logout(cookie_jar: &CookieJar<'_>){
+    cookie_jar.remove(Cookie::named("logged_in"));
+    cookie_jar.remove_private(Cookie::named("logged_in_info"));
 }
 
 #[options("/<_path..>")]
