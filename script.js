@@ -213,3 +213,13 @@ const parseNewEntry = (newEntry) => {
     let links = Alpine.store('links').value;
     links.push(parsedEntry)
 }
+
+const deleteNewEntry = (entry) => {
+
+    let links = Alpine.store('links').value;
+
+    filtered_links = links.filter((link) => link != entry)
+
+    Alpine.store('links').value = filtered_links;
+    
+}

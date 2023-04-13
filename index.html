@@ -20,7 +20,8 @@
     <script defer src="https://unpkg.com/@shaun/alpinejs-router@1.2.13/dist/cdn.min.js"></script>
     <script defer src="script.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script type="module"> import normalizeUrl from "https://cdn.jsdelivr.net/npm/normalize-url@8.0.0/+esm"; window.normalizeUrl = normalizeUrl;</script>
+    <script
+        type="module"> import normalizeUrl from "https://cdn.jsdelivr.net/npm/normalize-url@8.0.0/+esm"; window.normalizeUrl = normalizeUrl;</script>
     <script nomodule>window.normalizeUrl = url => url</script>
 </head>
 
@@ -33,20 +34,24 @@
             $store.state == 1 ? usePassword(this.passwordVal) : login(this.usernameVal, this.passwordVal)
         }
 
-    }" :class="$store.passwordWall.value && 'password-wall-active d-flex'" class=" align-items-center justify-content-center"
-        id="password-wall">
+    }" :class="$store.passwordWall.value && 'password-wall-active d-flex'"
+        class=" align-items-center justify-content-center" id="password-wall">
         <form action="" method="post" x-data :autocomplete="$store.state == 2 ? 'on' : 'off'">
             <div class="mb-3">
                 <label x-data x-show="$store.state == 2" for="username" class="form-label">Username</label>
-                <input x-data x-show="$store.state == 2" type="text" class="form-control mb-2" id="username" x-model="usernameVal">
+                <input x-data x-show="$store.state == 2" type="text" class="form-control mb-2" id="username"
+                    x-model="usernameVal">
                 <label for="password" class="form-label">Password</label>
                 <template x-if="$store.state == 1">
-                    <input x-data  type="password" class="form-control" id="otp-password" name="otp-password" x-model="passwordVal" autocomplete="one-time-code" @keyup.enter="submit" >
+                    <input x-data type="password" class="form-control" id="otp-password" name="otp-password"
+                        x-model="passwordVal" autocomplete="one-time-code" @keyup.enter="submit">
                 </template>
                 <template x-if="$store.state == 2">
-                    <input x-data type="password" class="form-control" id="login-password" name="login-password" x-model="passwordVal" autocomplete="current-password" @keyup.enter="submit" >
+                    <input x-data type="password" class="form-control" id="login-password" name="login-password"
+                        x-model="passwordVal" autocomplete="current-password" @keyup.enter="submit">
                 </template>
-                <div x-data x-show="$store.state == 1" id="bunch-password-help" class="form-text">Ask the person who's shared this link.</div>
+                <div x-data x-show="$store.state == 1" id="bunch-password-help" class="form-text">Ask the person who's
+                    shared this link.</div>
             </div>
             <div class="d-flex justify-content-center">
                 <button x-data x-on:click="submit()" type="button" class="btn btn-primary">Log in</button>
@@ -57,10 +62,12 @@
     <div class="container">
         <div class="row py-5 justify-content-center">
             <template x-if="$store.state == 1">
-                <h2 x-data class="col-sm d-flex justify-content-sm-start justify-content-center new" id="bunch-title" x-text="$store.bunch.title">
+                <h2 x-data class="col-sm d-flex justify-content-sm-start justify-content-center new" id="bunch-title"
+                    x-text="$store.bunch.title">
             </template>
             <template x-if="$store.state == 2">
-                <input x-data class="col-sm d-flex h2 justify-content-sm-start justify-content-center new" id="bunch-title" x-model="$store.bunch.title" placeholder="Title">
+                <input x-data class="col-sm d-flex h2 justify-content-sm-start justify-content-center new"
+                    id="bunch-title" x-model="$store.bunch.title" placeholder="Title">
             </template>
             </h2>
             <div x-data class="col-auto align-self-center" id="bunch-date-author" x-show="$store.state == 1">
@@ -70,7 +77,8 @@
                 </div>
                 <div x-data class="row" x-show="$store.bunch.username">
                     <div class="col">by:</div>
-                    <div x-data class="col d-flex justify-content-end" id="bunch-creator" x-text="$store.bunch.username"></div>
+                    <div x-data class="col d-flex justify-content-end" id="bunch-creator"
+                        x-text="$store.bunch.username"></div>
                 </div>
             </div>
         </div>
@@ -79,16 +87,19 @@
     <div class="card container bg-light" x-show="$store.bunch.description || $store.state == 2">
         <div class="card-body">
             <h6 x-data x-show="$store.state == 1" class="card-title">Description</h6>
-            <textarea x-data x-show="$store.state == 2" class="new bg-light" id="bunch-description" x-model="$store.bunch.description" placeholder="Description" x-init="$watch('$store.bunch.description', d => $el.style.height = $el.scrollHeight + 'px')"></textarea>
-            <p x-data x-show="$store.state == 1" class="new bg-light" id="bunch-description" x-text="$store.bunch.description"></p>
-            </div>
+            <textarea x-data x-show="$store.state == 2" class="new bg-light" id="bunch-description"
+                x-model="$store.bunch.description" placeholder="Description"
+                x-init="$watch('$store.bunch.description', d => $el.style.height = $el.scrollHeight + 'px')"></textarea>
+            <p x-data x-show="$store.state == 1" class="new bg-light" id="bunch-description"
+                x-text="$store.bunch.description"></p>
         </div>
+    </div>
     </div>
 
     <div class="my-5"></div>
 
     <div class="container" id="link-container">
-        
+
         <template x-data x-if="$store.state == 1">
             <div>
                 <ul class="list-group list-group-flush">
@@ -101,22 +112,43 @@
                             <input
                                 @click="if ($el.checked) $store.selected.set(entry.id, entry); else $store.selected.delete(entry.id)"
                                 class="form-check-input me-3" type="checkbox" value="">
-                            <a x-data @click="sendClicked(entry)" class="link-dark link-list-link" x-text="entry.title"></a>
+                            <a x-data @click="sendClicked(entry)" class="link-dark link-list-link"
+                                x-text="entry.title"></a>
                         </li>
                     </template>
                 </ul>
             </div>
         </template>
-        
+
         <template x-data x-if="$store.state == 2">
             <ul class="list-group list-group-flush">
                 <template x-data x-for="entry in $store.links.value" :key="entry.id">
-                    <li class="list-group-item new">
-                        <a x-data class="link-dark link-list-link" x-text="entry.title" :href="entry.url" target="_blank"></a>
+                    <li class="list-group-item new-entry">
+                        <div
+                            class="list-item-container container-fluid d-flex flex-row justify-content-start align-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-plus" viewBox="0 0 16 16" x-data @click="deleteNewEntry(entry)">
+                                <path
+                                    d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+                            </svg>
+                            <a x-data class="link-dark link-list-link" x-text="entry.title" :href="entry.url"
+                                target="_blank"></a>
+                        </div>
                     </li>
                 </template>
-                <li class="list-group-item new">
-                    <input x-data="{newEntry: ''}" class="form-text link-dark me-3" placeholder="example.com Title" x-model="newEntry" @keyup.enter="parseNewEntry(newEntry); newEntry=''">
+                <li class="list-group-item">
+                    <div
+                        class="list-item-container container-fluid d-flex flex-row justify-content-start align-items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-plus" viewBox="0 0 16 16">
+                            <path
+                                d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+                        </svg>
+                        <input x-data="{newEntry: ''}" class="form-text link-dark flex-grow-1"
+                            placeholder="example.com Title" x-model="newEntry"
+                            @keyup.enter="parseNewEntry(newEntry); newEntry=''"
+                            @keyup.backspace="if (newEntry.length==0) $store.links.value.pop();">
+                    </div>
                 </li>
             </ul>
         </template>
@@ -154,7 +186,8 @@
                             return $store.links.length <= 0;
                     }
                 }
-            }" x-on:click="button_click()" class="btn btn-primary mt-3" :disabled="button_disabled()" x-text="button_text()"></button>
+            }" x-on:click="button_click()" class="btn btn-primary mt-3" :disabled="button_disabled()"
+                x-text="button_text()"></button>
         </template>
     </div>
 </body>
