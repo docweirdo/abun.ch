@@ -39,5 +39,4 @@ creator: id, password, username, admin
 * implement account creation via token
 * provide visual feedback for failed login
 * worry about crsf
-* close visual gaps between input and finished list item
 * validate URLs to be actuals links

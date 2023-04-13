@@ -65,17 +65,38 @@ input.new:focus-visible{
     outline: none;
 }
 
-li.new {
-    padding: 0.2rem 0rem;
-    margin: 0rem 1rem;
+li.new-entry path{
+    stroke: #212529;
 }
 
-li > input.form-text{
-    border-width: 0;
-    background-color: -internal-light-dark(rgba(239, 239, 239, 0.3), rgba(59, 59, 59, 0.3));
-    outline: none;
-    width: 100%;
+li.new-entry svg{
+    transition: transform 0.2s;
 }
+
+li.new-entry svg:hover{
+    transform: rotate(45deg);
+}
+
+div.list-item-container {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+div.list-item-container input.form-text{
+    border-width: 0;
+    outline: none;
+    margin-top: 0;
+    font-size: 1rem;
+}
+
+div.list-item-container path{
+    stroke-width: 1;
+}
+
+div.list-item-container svg{
+    margin-right: 0.5rem;
+}
+
 
 a {
     cursor: pointer;
