@@ -73,6 +73,12 @@ pub async fn new_bunch(new_bunch: NewBunch, creator_id : i32, mut conn: Connecti
     
     let mut uri = BunchURL::new();
 
+    let pw_hash = if let Some(password) = new_bunch.password{
+        Some(bcrypt::hash(password)?)
+    } else {
+        None
+    };
+
     loop {
         let result = query!("SELECT COUNT(1) FROM bunch WHERE uri = $1", uri.to_string()).fetch_one(&mut *conn).await?;
 
@@ -88,7 +94,7 @@ pub async fn new_bunch(new_bunch: NewBunch, creator_id : i32, mut conn: Connecti
         new_bunch.description,
         new_bunch.expiration,
         uri.to_string(),
-        new_bunch.password,
+        pw_hash,
         new_bunch.open_graph,
         new_bunch.incognito,
         creator_id

@@ -182,7 +182,6 @@ impl<'r> FromRequest<'r> for AuthorizationGuard{
             return request::Outcome::Failure((Status::Unauthorized, AbunchError::WrongPassword(param.to_owned())))
         };
         
-        
         if bcrypt::verify(password, &pw_hash){
             return request::Outcome::Success(AuthorizationGuard);
         } else{
@@ -216,6 +215,16 @@ impl<'r> FromData<'r> for NewBunch {
             if time::OffsetDateTime::now_utc().date() >= exp {
                 return data::Outcome::Failure((Status::BadRequest, AbunchError::StatusCode(400)))
             }
+        }
+
+        if let Some(ref password) = new_bunch.password{
+            if password.chars().count() > 20 {
+                return data::Outcome::Failure((Status::BadRequest, AbunchError::StatusCode(400)));
+            }
+        }
+
+        if new_bunch.entries.is_empty() || new_bunch.entries.len() > 100 {
+            return data::Outcome::Failure((Status::BadRequest, AbunchError::StatusCode(400)));
         }
 
         data::Outcome::Success(new_bunch)
