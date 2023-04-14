@@ -169,6 +169,16 @@ const openLinks = () => {
 
 }
 
+const createNewBunch = () => {
+
+    // TODO: visual feedback for validation 
+
+    bunch = Alpine.store('bunch');
+    new_links = Alpine.store('links').value;
+
+    console.log(bunch, new_links)
+}
+
 const sendClicked = (entry) => {
     fetch(`https://api.abun.ch/${Alpine.store('path')}/clicked/${entry.id}`, {method: 'POST', headers})
     window.open(entry.url, '_blank')

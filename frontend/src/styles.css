@@ -97,6 +97,16 @@ div.list-item-container svg{
     margin-right: 0.5rem;
 }
 
+div.new-bunch-options input{
+    margin-top: 0;
+    margin-right: 0.25rem;
+}
+
+#new-bunch-password{
+    min-width: 185px;
+}
+
+
 
 a {
     cursor: pointer;
