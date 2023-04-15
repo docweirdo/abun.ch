@@ -131,7 +131,7 @@ class Link {
 } 
 
 const fetchBunch = async (uri) => {
-    let response = await fetch(`${backend}/${uri}`, {headers})
+    let response = await fetch(`${backend}/${uri}`, {headers, credentials: 'include'})
     
     if (response.status === 401){
         return Promise.reject('unauthorized');
