@@ -1,8 +1,6 @@
 document.addEventListener('alpine:init', async () => {
-    Alpine.store('passwordWall', {value: false}) // object because of fucked up simple stores
-
-    Alpine.store('bunch', new Bunch()) // init here because within effect triggers loop
-    Alpine.store('selected', new Map())
+    
+    init_stores(); // init here because within effect triggers loop
 
     Alpine.effect(() => {
         path = Alpine.$router.path;
@@ -14,6 +12,14 @@ document.addEventListener('alpine:init', async () => {
 // Global State
 let headers;
 let failedTries;
+let backend = "http://127.0.0.1:8000" //"https://api.abun.ch"
+
+function init_stores(){
+    Alpine.store('passwordWall', {value: false}) // object because of fucked up simple stores
+
+    Alpine.store('bunch', new Bunch()) 
+    Alpine.store('selected', new Map())
+}
 
 function path_change(){
     router = Alpine.$router;
@@ -125,7 +131,7 @@ class Link {
 } 
 
 const fetchBunch = async (uri) => {
-    let response = await fetch(`https://api.abun.ch/${uri}`, {headers})
+    let response = await fetch(`${backend}/${uri}`, {headers})
     
     if (response.status === 401){
         return Promise.reject('unauthorized');
@@ -169,18 +175,46 @@ const openLinks = () => {
 
 }
 
-const createNewBunch = () => {
+const createNewBunch = async () => {
+
+    let anonymous_box = document.getElementById("checkbox-anonymous");
+    let password_input = document.getElementById("new-bunch-password");
+
+    let bunch = Alpine.store('bunch');
+    bunch.title = bunch.title.trim();
+    bunch.description = bunch.description.trim();
+    bunch.incognito = anonymous_box.checked;
+    bunch.open_graph = false;
+    bunch.password = password_input.value.length > 0 ? password_input.value : null;
+
+    let new_links = Alpine.store('links').value;
 
     // TODO: visual feedback for validation 
 
-    bunch = Alpine.store('bunch');
-    new_links = Alpine.store('links').value;
+    if (bunch.title.length == 0) return;
+    if (bunch.password && bunch.password.length > 20) return; //TODO: refactoring to utf8 or visible chars
+    if (new_links.length < 1) return;
 
-    console.log(bunch, new_links)
+    new_links = new_links.map((link) => {
+        delete link.id;
+        return link;
+    });
+
+    console.log(JSON.stringify(bunch), JSON.stringify(new_links))
+
+    bunch.entries = new_links;
+
+    let newBunchResponse = await fetch(`${backend}/new`, {method: 'POST', headers, credentials: "include", body: JSON.stringify(bunch)});
+
+    if (newBunchResponse.ok){
+        newBunchUrl = await newBunchResponse.json();
+        window.location.pathname = newBunchUrl;
+    }
+    
 }
 
 const sendClicked = (entry) => {
-    fetch(`https://api.abun.ch/${Alpine.store('path')}/clicked/${entry.id}`, {method: 'POST', headers})
+    fetch(`${backend}/${Alpine.store('path')}/clicked/${entry.id}`, {method: 'POST', headers})
     window.open(entry.url, '_blank')
 }
 
@@ -192,7 +226,7 @@ const usePassword = p => {
 }
 
 const login = async (u, p) => {
-    let response = await fetch('https://api.abun.ch/login', { method: 'POST', body: JSON.stringify({password: p, username: u})})
+    let response = await fetch(`${backend}/login`, { method: 'POST', body: JSON.stringify({password: p, username: u}), credentials: "include"})
     if (response.ok){
         Alpine.store('passwordWall').value = false;
     }

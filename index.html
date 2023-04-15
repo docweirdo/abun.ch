@@ -146,7 +146,8 @@
                         </svg>
                         <input x-data="{newEntry: ''}" class="form-text link-dark flex-grow-1"
                             placeholder="example.com Title" x-model="newEntry" name="newBunchEntry"
-                            @keyup.enter="parseNewEntry(newEntry); newEntry=''"
+                            @keyup.enter="parseNewEntry(newEntry); newEntry=''" enterkeyhint="done"
+                            autocorrect="off" autocomplete="off"
                             @keyup.backspace="if (newEntry.length==0) $store.links.value.pop();">
                     </div>
                 </li>
