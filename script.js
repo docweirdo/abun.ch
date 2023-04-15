@@ -12,7 +12,7 @@ document.addEventListener('alpine:init', async () => {
 // Global State
 let headers;
 let failedTries;
-let backend = "http://127.0.0.1:8000" //"https://api.abun.ch"
+let backend = "https://api.abun.ch"
 
 function init_stores(){
     Alpine.store('passwordWall', {value: false}) // object because of fucked up simple stores
@@ -229,6 +229,13 @@ const login = async (u, p) => {
     let response = await fetch(`${backend}/login`, { method: 'POST', body: JSON.stringify({password: p, username: u}), credentials: "include"})
     if (response.ok){
         Alpine.store('passwordWall').value = false;
+    }
+}
+
+const logout = async () => {
+    let response = await fetch(`${backend}/logout`, { method: 'POST', credentials: "include"});
+    if (response.ok){
+        window.location.pathname = "";
     }
 }
 

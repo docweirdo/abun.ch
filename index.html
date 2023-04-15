@@ -81,6 +81,9 @@
                         x-text="$store.bunch.username"></div>
                 </div>
             </div>
+            <div x-data class="col-auto align-self-center" id="logout-column" x-show="$store.state == 2">
+                <button type="button" class="btn btn-light" id="logout-button" x-data @click="logout()">Logout</button>
+            </div>
         </div>
     </div>
 
