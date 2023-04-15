@@ -40,3 +40,4 @@ creator: id, password, username, admin
 * provide visual feedback for failed login
 * worry about crsf
 * validate URLs to be actuals links
+* refactor so stringlength is enforced for either all utf-8 or visible characters
