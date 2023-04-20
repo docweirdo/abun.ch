@@ -128,6 +128,16 @@ class Link {
     set title (t){
         this.titleVal = t;
     }
+
+    toJSON() {
+        return {
+          id: this.id,
+          url: this.url,
+          title: this.title,
+          description: this.description
+        }
+    }
+    
 } 
 
 const fetchBunch = async (uri) => {

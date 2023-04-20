@@ -41,3 +41,5 @@ creator: id, password, username, admin
 * worry about crsf
 * validate URLs to be actuals links
 * refactor so stringlength is enforced for either all utf-8 or visible characters
+* fix backspace deleting entry to early
+* send titles for entries from backend
