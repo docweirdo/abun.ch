@@ -1,6 +1,6 @@
 <!doctype html>
 
-<html lang="en">
+<html lang="en" class="h-100">
 
 <head>
     <meta charset="utf-8">
@@ -25,200 +25,208 @@
     <script nomodule>window.normalizeUrl = url => url</script>
 </head>
 
-<body x-data :class="$store.passwordWall.value && 'password-wall-active'">
-    <div x-data="{
-        passwordVal: '', 
-        usernameVal: '',
+<body class="d-flex flex-column h-100">
+    <main x-data class="flex-shrink-0" :class="$store.passwordWall.value && 'password-wall-active'">
+        <div x-data="{
+            passwordVal: '', 
+            usernameVal: '',
 
-        submit(){
-            $store.state == 1 ? usePassword(this.passwordVal) : login(this.usernameVal, this.passwordVal)
-        }
+            submit(){
+                $store.state == 1 ? usePassword(this.passwordVal) : login(this.usernameVal, this.passwordVal)
+            }
 
-    }" :class="$store.passwordWall.value && 'password-wall-active d-flex'"
-        class=" align-items-center justify-content-center" id="password-wall">
-        <form action="" method="post" x-data :autocomplete="$store.state == 2 ? 'on' : 'off'">
-            <div class="mb-3">
-                <label x-data x-show="$store.state == 2" for="username" class="form-label">Username</label>
-                <input x-data x-show="$store.state == 2" type="text" class="form-control mb-2" id="username"
-                    x-model="usernameVal">
-                <label for="password" class="form-label">Password</label>
+        }" :class="$store.passwordWall.value && 'password-wall-active d-flex'"
+            class=" align-items-center justify-content-center" id="password-wall">
+            <form action="" method="post" x-data :autocomplete="$store.state == 2 ? 'on' : 'off'">
+                <div class="mb-3">
+                    <label x-data x-show="$store.state == 2" for="username" class="form-label">Username</label>
+                    <input x-data x-show="$store.state == 2" type="text" class="form-control mb-2" id="username"
+                        x-model="usernameVal">
+                    <label for="password" class="form-label">Password</label>
+                    <template x-if="$store.state == 1">
+                        <input x-data type="password" class="form-control" id="otp-password" name="otp-password"
+                            x-model="passwordVal" autocomplete="one-time-code" @keyup.enter="submit">
+                    </template>
+                    <template x-if="$store.state == 2">
+                        <input x-data type="password" class="form-control" id="login-password" name="login-password"
+                            x-model="passwordVal" autocomplete="current-password" @keyup.enter="submit">
+                    </template>
+                    <div x-data x-show="$store.state == 1" id="bunch-password-help" class="form-text">Ask the person who's
+                        shared this link.</div>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <button x-data x-on:click="submit()" type="button" class="btn btn-primary">Log in</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="container" x-data x-show="$store.state != 0">
+            <div class="row py-5 justify-content-center">
                 <template x-if="$store.state == 1">
-                    <input x-data type="password" class="form-control" id="otp-password" name="otp-password"
-                        x-model="passwordVal" autocomplete="one-time-code" @keyup.enter="submit">
+                    <h2 x-data class="col-sm d-flex justify-content-sm-start justify-content-center new" id="bunch-title"
+                        x-text="$store.bunch.title">
                 </template>
                 <template x-if="$store.state == 2">
-                    <input x-data type="password" class="form-control" id="login-password" name="login-password"
-                        x-model="passwordVal" autocomplete="current-password" @keyup.enter="submit">
+                    <input x-data class="col-sm d-flex h2 justify-content-sm-start justify-content-center new"
+                        id="bunch-title" x-model="$store.bunch.title" placeholder="Title">
                 </template>
-                <div x-data x-show="$store.state == 1" id="bunch-password-help" class="form-text">Ask the person who's
-                    shared this link.</div>
-            </div>
-            <div class="d-flex justify-content-center">
-                <button x-data x-on:click="submit()" type="button" class="btn btn-primary">Log in</button>
-            </div>
-        </form>
-    </div>
-
-    <div class="container">
-        <div class="row py-5 justify-content-center">
-            <template x-if="$store.state == 1">
-                <h2 x-data class="col-sm d-flex justify-content-sm-start justify-content-center new" id="bunch-title"
-                    x-text="$store.bunch.title">
-            </template>
-            <template x-if="$store.state == 2">
-                <input x-data class="col-sm d-flex h2 justify-content-sm-start justify-content-center new"
-                    id="bunch-title" x-model="$store.bunch.title" placeholder="Title">
-            </template>
-            </h2>
-            <div x-data class="col-auto align-self-center" id="bunch-date-author" x-show="$store.state == 1">
-                <div class="row">
-                    <div class="col">from:</div>
-                    <div x-data class="col d-flex justify-content-end" id="bunch-date" x-text="$store.bunch.date"></div>
+                </h2>
+                <div x-data class="col-auto align-self-center" id="bunch-date-author" x-show="$store.state == 1">
+                    <div class="row">
+                        <div class="col">from:</div>
+                        <div x-data class="col d-flex justify-content-end" id="bunch-date" x-text="$store.bunch.date"></div>
+                    </div>
+                    <div x-data class="row" x-show="$store.bunch.username">
+                        <div class="col">by:</div>
+                        <div x-data class="col d-flex justify-content-end" id="bunch-creator"
+                            x-text="$store.bunch.username"></div>
+                    </div>
                 </div>
-                <div x-data class="row" x-show="$store.bunch.username">
-                    <div class="col">by:</div>
-                    <div x-data class="col d-flex justify-content-end" id="bunch-creator"
-                        x-text="$store.bunch.username"></div>
+                <div x-data class="col-auto align-self-center" id="logout-column" x-show="$store.state == 2">
+                    <button type="button" class="btn btn-light" id="logout-button" x-data @click="logout()">Logout</button>
                 </div>
             </div>
-            <div x-data class="col-auto align-self-center" id="logout-column" x-show="$store.state == 2">
-                <button type="button" class="btn btn-light" id="logout-button" x-data @click="logout()">Logout</button>
+        </div>
+
+        <div class="card container bg-light" x-show="$store.bunch.description || $store.state == 2">
+            <div class="card-body">
+                <h6 x-data x-show="$store.state == 1" class="card-title">Description</h6>
+                <textarea x-data x-show="$store.state == 2" class="new bg-light" id="bunch-description"
+                    x-model="$store.bunch.description" placeholder="Description"
+                    x-init="$watch('$store.bunch.description', d => $el.style.height = $el.scrollHeight + 'px')"></textarea>
+                <p x-data x-show="$store.state == 1" class="new bg-light" id="bunch-description"
+                    x-text="$store.bunch.description"></p>
             </div>
         </div>
-    </div>
-
-    <div class="card container bg-light" x-show="$store.bunch.description || $store.state == 2">
-        <div class="card-body">
-            <h6 x-data x-show="$store.state == 1" class="card-title">Description</h6>
-            <textarea x-data x-show="$store.state == 2" class="new bg-light" id="bunch-description"
-                x-model="$store.bunch.description" placeholder="Description"
-                x-init="$watch('$store.bunch.description', d => $el.style.height = $el.scrollHeight + 'px')"></textarea>
-            <p x-data x-show="$store.state == 1" class="new bg-light" id="bunch-description"
-                x-text="$store.bunch.description"></p>
         </div>
-    </div>
-    </div>
 
-    <div class="my-5"></div>
+        <div class="my-5"></div>
 
-    <div class="container" id="link-container">
+        <div class="container" id="link-container">
 
-        <template x-data x-if="$store.state == 1">
-            <div>
+            <template x-data x-if="$store.state == 1">
+                <div>
+                    <ul class="list-group list-group-flush">
+                        <li x-data class="list-group-item" id="link-list-header" x-show="$store.state == 1">
+                            <input x-on:click="selectAll($el)" class="form-check-input" type="checkbox" value=""
+                                id="select-all-checkbox">
+                        </li>
+                        <template x-data x-for="entry in $store.links.value" :key="entry.id">
+                            <li class="list-group-item">
+                                <input
+                                    @click="if ($el.checked) $store.selected.set(entry.id, entry); else $store.selected.delete(entry.id)"
+                                    class="form-check-input me-3" type="checkbox" value="">
+                                <a x-data @click="sendClicked(entry)" class="link-dark link-list-link"
+                                    x-text="entry.title"></a>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </template>
+
+            <template x-data x-if="$store.state == 2">
                 <ul class="list-group list-group-flush">
-                    <li x-data class="list-group-item" id="link-list-header" x-show="$store.state == 1">
-                        <input x-on:click="selectAll($el)" class="form-check-input" type="checkbox" value=""
-                            id="select-all-checkbox">
-                    </li>
                     <template x-data x-for="entry in $store.links.value" :key="entry.id">
-                        <li class="list-group-item">
-                            <input
-                                @click="if ($el.checked) $store.selected.set(entry.id, entry); else $store.selected.delete(entry.id)"
-                                class="form-check-input me-3" type="checkbox" value="">
-                            <a x-data @click="sendClicked(entry)" class="link-dark link-list-link"
-                                x-text="entry.title"></a>
+                        <li class="list-group-item new-entry">
+                            <div
+                                class="list-item-container container-fluid d-flex flex-row justify-content-start align-items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-plus" viewBox="0 0 16 16" x-data @click="deleteNewEntry(entry)">
+                                    <path
+                                        d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+                                </svg>
+                                <a x-data class="link-dark link-list-link" x-text="entry.title" :href="entry.url"
+                                    target="_blank"></a>
+                            </div>
                         </li>
                     </template>
-                </ul>
-            </div>
-        </template>
-
-        <template x-data x-if="$store.state == 2">
-            <ul class="list-group list-group-flush">
-                <template x-data x-for="entry in $store.links.value" :key="entry.id">
-                    <li class="list-group-item new-entry">
+                    <li class="list-group-item">
                         <div
                             class="list-item-container container-fluid d-flex flex-row justify-content-start align-items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-plus" viewBox="0 0 16 16" x-data @click="deleteNewEntry(entry)">
+                                class="bi bi-plus" viewBox="0 0 16 16">
                                 <path
                                     d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
                             </svg>
-                            <a x-data class="link-dark link-list-link" x-text="entry.title" :href="entry.url"
-                                target="_blank"></a>
+                            <input x-data="{newEntry: ''}" class="form-text link-dark flex-grow-1"
+                                placeholder="example.com Title" x-model="newEntry" name="newBunchEntry"
+                                @keyup.enter="parseNewEntry(newEntry); newEntry=''" enterkeyhint="done"
+                                autocorrect="off" autocomplete="off"
+                                @keydown.backspace="if (newEntry.length==0) $store.links.value.pop();">
                         </div>
                     </li>
-                </template>
-                <li class="list-group-item">
-                    <div
-                        class="list-item-container container-fluid d-flex flex-row justify-content-start align-items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            class="bi bi-plus" viewBox="0 0 16 16">
-                            <path
-                                d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
-                        </svg>
-                        <input x-data="{newEntry: ''}" class="form-text link-dark flex-grow-1"
-                            placeholder="example.com Title" x-model="newEntry" name="newBunchEntry"
-                            @keyup.enter="parseNewEntry(newEntry); newEntry=''" enterkeyhint="done"
-                            autocorrect="off" autocomplete="off"
-                            @keyup.backspace="if (newEntry.length==0) $store.links.value.pop();">
-                    </div>
-                </li>
-            </ul>
-        </template>
+                </ul>
+            </template>
 
-    </div>
+        </div>
 
-    <div class="container pe-0 ps-0">
-        <hr/>
-    </div>
-    
+        <div class="container pe-0 ps-0" x-data x-show="$store.state != 0">
+            <hr/>
+        </div>
+        
 
-    <template x-data x-if="$store.state != 0">
-        <div class="container mt-3">
-            <div class="row gy-4 d-flex align-items-center">
-                <div class="container col-sm-9" x-show="$store.state == 2">
-                    <div class="row gy-3 new-bunch-options">
-                        <div class="col d-flex justify-content-center">
-                            <input class="form-control" type="password" name="bunch-password" autocomplete="new-password" maxlength="20" value="" placeholder="Optional password" id="new-bunch-password">
-                        </div>
-                        <div class="col d-flex justify-content-center align-items-center">
-                            <input class="form-check-input" type="checkbox" value="" id="checkbox-anonymous">
-                            <label class="form-check-label" for="checkbox-anonymous">
-                                Hide username
-                            </label>
+        <template x-data x-if="$store.state != 0">
+            <div class="container mt-3">
+                <div class="row gy-4 d-flex align-items-center justify-content-end">
+                    <div class="container col-sm-9" x-show="$store.state == 2">
+                        <div class="row gy-3 new-bunch-options">
+                            <div class="col d-flex justify-content-center">
+                                <input class="form-control" type="password" name="bunch-password" autocomplete="new-password" maxlength="20" value="" placeholder="Optional password" id="new-bunch-password">
+                            </div>
+                            <div class="col d-flex justify-content-center align-items-center">
+                                <input class="form-check-input" type="checkbox" value="" id="checkbox-anonymous">
+                                <label class="form-check-label" for="checkbox-anonymous">
+                                    Hide username
+                                </label>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-sm-3 d-flex flex-row justify-content-sm-end justify-content-center align-items-center">
-                    <button x-data="{
-                    button_text(){
-                        switch ($store.state) {
-                            case 1:
-                            return 'Open'
-                            case 2:
-                            return 'Create'
+                    <div class="col-sm-3 d-flex flex-row justify-content-sm-end justify-content-center align-items-center">
+                        <button x-data="{
+                        button_text(){
+                            switch ($store.state) {
+                                case 1:
+                                return 'Open'
+                                case 2:
+                                return 'Create'
+                            }
+                        },
+        
+                        button_click(){
+                            switch ($store.state) {
+                                case 1:
+                                    openLinks()
+                                    break;
+                                case 2:
+                                    createNewBunch()
+                                    break;
+                            }
+                        },
+                        
+                        button_disabled(){
+                            switch ($store.state) {
+                                case 1:
+                                    return $store.selected.size == 0
+                                case 2:
+                                    return $store.links.length <= 0;
+                            }
                         }
-                    },
-    
-                    button_click(){
-                        switch ($store.state) {
-                            case 1:
-                                openLinks()
-                                break;
-                            case 2:
-                                createNewBunch()
-                                break;
-                        }
-                    },
-                    
-                    button_disabled(){
-                        switch ($store.state) {
-                            case 1:
-                                return $store.selected.size == 0
-                            case 2:
-                                return $store.links.length <= 0;
-                        }
-                    }
-                }" x-on:click="button_click()" class="btn btn-primary" :disabled="button_disabled()"
-                        x-text="button_text()"></button>
+                    }" x-on:click="button_click()" class="btn btn-primary" :disabled="button_disabled()"
+                            x-text="button_text()"></button>
 
+                    </div>
                 </div>
             </div>
-        </div>
-    </template>
+        </template>
 
-    </div>
+        <template x-route="/" template="/info.html"></template>
+    </main>
+
+    <footer class="footer mt-auto py-1 px-2 bg-light" x-data x-show="$store.state != 0">
+        <div class="container">
+            <a href="/" style="text-decoration: none;"><span class="text-muted">Info</span></a>
+        </div>
+    </footer>
 </body>
 
 </html>
