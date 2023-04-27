@@ -95,8 +95,8 @@ pub async fn new_bunch(mut new_bunch: NewBunch, creator_id : i32, mut conn: Conn
     }
     
     let bunch = query!("
-        INSERT INTO bunch(title, description, date, expiration, clickcounter, uri, password, open_graph, incognito, creator_id) 
-        VALUES($1, $2, CURRENT_DATE, $3, 0, $4, $5, $6, $7, $8) RETURNING id;",
+        INSERT INTO bunch(title, description, date, expiration, clickcounter, uri, password, open_graph, incognito, redirect, creator_id) 
+        VALUES($1, $2, CURRENT_DATE, $3, 0, $4, $5, $6, $7, $8, $9) RETURNING id;",
         new_bunch.title,
         new_bunch.description,
         new_bunch.expiration,
@@ -104,6 +104,7 @@ pub async fn new_bunch(mut new_bunch: NewBunch, creator_id : i32, mut conn: Conn
         pw_hash,
         new_bunch.open_graph,
         new_bunch.incognito,
+        new_bunch.redirect,
         creator_id
     ).fetch_one(&mut *conn).await?;
 
