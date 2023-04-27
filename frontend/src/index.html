@@ -167,7 +167,17 @@
 
         <template x-data x-if="$store.state != 0">
             <div class="container mt-3">
-                <div class="row gy-4 d-flex align-items-center justify-content-end">
+                <div class="row gy-4 d-flex align-items-center justify-content-end" 
+                x-data="{
+                    button_disabled(){
+                        switch ($store.state) {
+                            case 1:
+                                return $store.selected.size == 0
+                            case 2:
+                                return $store.links.value.length == 0;
+                        }
+                    }
+                }">
                     <div class="container col-sm-9" x-show="$store.state == 2">
                         <div class="row gy-3 new-bunch-options">
                             <div class="col d-flex justify-content-center">
@@ -179,40 +189,37 @@
                                     Hide username
                                 </label>
                             </div>
+                            <div class="col d-flex justify-content-center align-items-center">
+                                <input class="form-check-input" :disabled="button_disabled()" type="checkbox" value="" id="checkbox-redirect">
+                                <label class="form-check-label" for="checkbox-redirect">
+                                    Instant redirect
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <div class="col-sm-3 d-flex flex-row justify-content-sm-end justify-content-center align-items-center">
                         <button x-data="{
-                        button_text(){
-                            switch ($store.state) {
-                                case 1:
-                                return 'Open'
-                                case 2:
-                                return 'Create'
+                            button_text(){
+                                switch ($store.state) {
+                                    case 1:
+                                    return 'Open'
+                                    case 2:
+                                    return 'Create'
+                                }
+                            },
+            
+                            button_click(){
+                                switch ($store.state) {
+                                    case 1:
+                                        openLinks()
+                                        break;
+                                    case 2:
+                                        createNewBunch()
+                                        break;
+                                }
                             }
-                        },
-        
-                        button_click(){
-                            switch ($store.state) {
-                                case 1:
-                                    openLinks()
-                                    break;
-                                case 2:
-                                    createNewBunch()
-                                    break;
-                            }
-                        },
-                        
-                        button_disabled(){
-                            switch ($store.state) {
-                                case 1:
-                                    return $store.selected.size == 0
-                                case 2:
-                                    return $store.links.length <= 0;
-                            }
-                        }
-                    }" x-on:click="button_click()" class="btn btn-primary" :disabled="button_disabled()"
-                            x-text="button_text()"></button>
+                        }" x-on:click="button_click()" class="btn btn-primary" :disabled="button_disabled()"
+                                x-text="button_text()"></button>
 
                     </div>
                 </div>
