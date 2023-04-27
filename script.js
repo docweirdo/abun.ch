@@ -65,6 +65,9 @@ async function set_uri(uri){
             headers.set('Authorization', password);
         }
         bunch = await fetchBunch(uri);
+        
+        check_for_redirect(bunch);
+
     } catch (error) {
         failedTries +=1
 
@@ -189,11 +192,13 @@ const createNewBunch = async () => {
 
     let anonymous_box = document.getElementById("checkbox-anonymous");
     let password_input = document.getElementById("new-bunch-password");
+    let redirect_box = document.getElementById("checkbox-redirect");
 
     let bunch = Alpine.store('bunch');
     bunch.title = bunch.title.trim();
     bunch.description = bunch.description.trim();
     bunch.incognito = anonymous_box.checked;
+    bunch.redirect = redirect_box.checked;
     bunch.open_graph = false;
     bunch.password = password_input.value.length > 0 ? password_input.value : null;
 
@@ -223,9 +228,14 @@ const createNewBunch = async () => {
     
 }
 
-const sendClicked = (entry) => {
+const sendClicked = (entry, redirect) => {
     fetch(`${backend}/${Alpine.store('path')}/clicked/${entry.id}`, {method: 'POST', headers})
-    window.open(entry.url, '_blank')
+    if (redirect){
+        window.open(entry.url)
+    } else {
+        window.open(entry.url, '_blank')
+    }
+    
 }
 
 const usePassword = p => {
@@ -273,6 +283,15 @@ const parseNewEntry = (newEntry) => {
 
     let links = Alpine.store('links').value;
     links.push(parsedEntry)
+
+    // const checkbox = document.getElementById('checkbox-redirect');
+
+    // if (links.length == 1){
+    //     checkbox.removeAttribute('disabled');
+    // } else {
+    //     checkbox.setAttribute('disabled', '');
+    //     checkbox.checked = false;
+    // }
 }
 
 const deleteNewEntry = (entry) => {
@@ -283,4 +302,11 @@ const deleteNewEntry = (entry) => {
 
     Alpine.store('links').value = filtered_links;
     
+}
+
+const check_for_redirect = (bunch) => {
+    if (bunch.redirect && bunch.entries.length == 1){
+        let entry = bunch.entries[0];
+        sendClicked(bunch, true);
+    }
 }
