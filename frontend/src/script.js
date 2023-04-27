@@ -231,7 +231,7 @@ const createNewBunch = async () => {
 const sendClicked = (entry, redirect) => {
     fetch(`${backend}/${Alpine.store('path')}/clicked/${entry.id}`, {method: 'POST', headers})
     if (redirect){
-        window.open(entry.url)
+        window.open(entry.url, '_self')
     } else {
         window.open(entry.url, '_blank')
     }
@@ -307,6 +307,6 @@ const deleteNewEntry = (entry) => {
 const check_for_redirect = (bunch) => {
     if (bunch.redirect && bunch.entries.length == 1){
         let entry = bunch.entries[0];
-        sendClicked(bunch, true);
+        sendClicked(entry, true);
     }
 }
