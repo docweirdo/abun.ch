@@ -136,7 +136,7 @@ class Link {
         return {
           id: this.id,
           url: this.url,
-          title: this.title,
+          title: this.titleVal,
           description: this.description
         }
     }
@@ -264,7 +264,7 @@ let newLinkID = 0;
 const parseNewEntry = (newEntry) => {
     // parse entry
     newEntry = newEntry.trim();
-    let index = newEntry.search(/\s+/)
+    let index = newEntry.search(/\s+/);
 
     index = index == -1 ? newEntry.length+1 : index
     
@@ -274,7 +274,7 @@ const parseNewEntry = (newEntry) => {
 
     let title;
 
-    if (index <= newEntry.length){
+    if (index < newEntry.length){
         title = newEntry.slice(index).trim();
     }
 
