@@ -11,7 +11,8 @@ pub struct Bunch {
     pub open_graph : bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub username : Option<String>,
-    pub entries : Vec<Entry>
+    pub entries : Vec<Entry>,
+    pub redirect : Option<bool>
 }
 
 #[derive(Serialize, Deserialize)]
@@ -32,7 +33,8 @@ pub struct NewBunch{
     pub password: Option<String>,
     pub open_graph: bool,
     pub incognito: bool,
-    pub entries: Vec<NewEntry>
+    pub entries: Vec<NewEntry>,
+    pub redirect: Option<bool>,
 }
 
 

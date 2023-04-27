@@ -30,7 +30,7 @@ pub async fn get_bunch_password_by_url(bunch_url: BunchURL, mut conn: Connection
 }
 
 pub async fn get_bunch_by_url(bunch_url: BunchURL, mut conn: Connection<AbunchDB>) -> Result<Bunch, AbunchError>{
-    let bunch = query!("SELECT id, title, description, date, open_graph, incognito, creator_id FROM bunch WHERE uri = $1", bunch_url.to_string())
+    let bunch = query!("SELECT id, title, description, date, open_graph, incognito, creator_id, redirect FROM bunch WHERE uri = $1", bunch_url.to_string())
         .fetch_one(&mut *conn)
         .await?;
 
@@ -49,7 +49,8 @@ pub async fn get_bunch_by_url(bunch_url: BunchURL, mut conn: Connection<AbunchDB
         date: bunch.date,
         open_graph: bunch.open_graph,
         username,
-        entries
+        entries,
+        redirect: bunch.redirect
     };
 
     query!("UPDATE bunch SET clickcounter = clickcounter + 1 WHERE id = $1", bunch.id).execute(&mut *conn).await?;
@@ -69,9 +70,15 @@ pub async fn clicked_url(bunch_url: BunchURL, entry_id: i32, mut conn: Connectio
     }
 }
 
-pub async fn new_bunch(new_bunch: NewBunch, creator_id : i32, mut conn: Connection<AbunchDB>) -> Result<BunchURL, AbunchError>{
+pub async fn new_bunch(mut new_bunch: NewBunch, creator_id : i32, mut conn: Connection<AbunchDB>) -> Result<BunchURL, AbunchError>{
     
     let mut uri = BunchURL::new();
+
+    if let Some(redirect) = new_bunch.redirect{
+        if redirect && new_bunch.entries.len() > 1 {
+            new_bunch.redirect = None;
+        }
+    }
 
     let pw_hash = if let Some(password) = new_bunch.password{
         Some(bcrypt::hash(password)?)
