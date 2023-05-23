@@ -10,9 +10,11 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^6.3.0",
     "@popperjs/core": "^2.11.7",
     "@types/bootstrap": "^5.2.6",
-    "astro": "^2.4.1",
-    "bootstrap": "^5.2.3"
+    "astro": "^2.5.5",
+    "bootstrap": "^5.2.3",
+    "normalize-url": "^8.0.0"
   }
 }
